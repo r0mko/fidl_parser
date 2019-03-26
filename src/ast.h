@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
@@ -45,6 +46,8 @@ struct FTypeDef : FTypeBase
 };
 
 using FEnum_Member = std::pair<string, boost::optional<int>>;
+using FAnnotation = std::pair<string, string>;
+using FAnnotationBlock = std::vector<FAnnotation>;
 
 struct FEnum : FTypeBase
 {
@@ -67,7 +70,6 @@ private:
         string operator()(FEnum f) const { return f.name; }
         string operator()(FTypeDef f) const { return f.name; }
     };
-
 
 public:
     using base_type::base_type;
@@ -115,6 +117,8 @@ public:
 
         string operator()(FTypeDef t) const {
             ostringstream out;
+
+
             out << "typedef " << t.name << " -> " << t.type;
             return out.str();
         }

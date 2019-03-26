@@ -37,6 +37,7 @@ using x3::_val;
 using x3::_attr;
 
 x3::rule<class identifier_id, string> const identifier { "identifier" };
+x3::rule<class identifier_id, string> const text { "text" };
 x3::rule<class fstruct_id, ast::FStruct> const fstruct { "fstruct" };
 x3::rule<class struct_member_id, ast::FStructMember> const struct_member { "struct_member" };
 x3::rule<class polymorphic_clause, string> const polymorphic_clause { "polymorphic_clause" };
@@ -47,6 +48,8 @@ x3::rule<class ftype_id, ast::FType> const ftype { "ftype" };
 x3::rule<class version_id, ast::FVersion> const version { "version" };
 x3::rule<class types_set_id, vector<ast::FType>> const types_set { "types_set" };
 x3::rule<class type_collection_id, ast::FTypeCollection> const type_collection { "type_collection" };
+x3::rule<class fannotation_id, ast::FAnnotation> const fannotation { "fannotation" };
+x3::rule<class fannotation_block_id, ast::FAnnotationBlock> const fannotation_block { "fannotation_block" };
 
 auto const identifier_def = x3::raw[lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
 
@@ -101,6 +104,10 @@ auto const version_def = lit("version") >> "{" >> lit("major") >> int_ >> lit("m
 auto const ftype_def = fstruct | ftypedef | fenum;
 auto const types_set_def = *(ftype[add_type]);
 auto const type_collection_def = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
+
+auto const fannotation_def = lit("@") >> identifier >> ":" >> text;
+
+auto const fannotation_block_def = lit("<**") >> +fannotation >> "**>";
 
 auto const whitespace
     = x3::blank
