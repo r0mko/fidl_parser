@@ -1,26 +1,11 @@
-#ifndef PARSER_H
-#define PARSER_H
-#ifdef __UNIX__
-#include <cxxabi.h>
-#endif
+#pragma once
+
 #include <boost/spirit/home/x3.hpp>
 #include <string>
 #include <iostream>
-#include "../ast/ast.h"
 
-template <typename T>
-std::string getTypeName(const T &v) {
-#ifdef __UNIX__
-    int status;
-    char *realname = abi::__cxa_demangle(typeid(decltype(v)).name(), nullptr, nullptr, &status);
-    std::string ret(realname);
-    free(realname);
-#else
-    const char *realname = typeid(decltype(v)).name();
-    std::string ret(realname);
-#endif
-    return ret;
-}
+#include "ast/ast.h"
+#include "utils.h"
 
 namespace fidl {
 
@@ -46,28 +31,16 @@ x3::rule<class enum_member_id, ast::FEnum_Member> const enum_member { "enum_memb
 x3::rule<class ftype_id, ast::FType> const ftype { "ftype" };
 x3::rule<class version_id, ast::FVersion> const version { "version" };
 x3::rule<class types_set_id, vector<ast::FType>> const types_set { "types_set" };
-x3::rule<class type_collection_id, ast::FTypeCollection> const type_collection { "type_collection" };
+x3::rule<class ftypecollection_id, ast::FTypeCollection> const ftypecollection { "type_collection" };
 x3::rule<class fannotation_id, ast::FAnnotation> const fannotation { "fannotation" };
 x3::rule<class fannotation_block_id, ast::FAnnotationBlock> const fannotation_block { "fannotation_block" };
+x3::rule<class fmodel_id, ast::FModel> const fmodel { "fmodel" };
 
 auto const identifier_def = x3::raw[lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
 
 static struct known_type_parser : x3::symbols<string>
 {
-    known_type_parser() {
-        add("Float", "Float");
-        add("Double", "Double");
-        add("UInt64", "UInt64");
-        add("UInt32", "UInt32");
-        add("UInt16", "UInt16");
-        add("UInt8", "UInt8");
-        add("Int64", "Int64");
-        add("Int32", "Int32");
-        add("Int16", "Int16");
-        add("Int8", "Int8");
-        add("Boolean", "Boolean");
-        add("String", "String");
-    }
+    known_type_parser();
 } known_type;
 
 // FIXME: remove. This is a helper function for debugging purposes.
@@ -102,11 +75,13 @@ auto const ftypedef_def = -fannotation_block >> "typedef" >> identifier >> "is" 
 auto const version_def = lit("version") >> "{" >> lit("major") >> int_ >> lit("minor") >> int_ >> "}";
 auto const ftype_def = fstruct | ftypedef | fenum;
 auto const types_set_def = *(ftype[add_type]);
-auto const type_collection_def = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
+auto const ftypecollection_def = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
 
 auto const annotation_text = x3::rule<class annotation_text_id, std::string>{} = x3::lexeme[*(x3::char_ - (lit("**>") | lit("@"))) ];
 auto const fannotation_def = lit("@") >> identifier >> ":" >> annotation_text;
 auto const fannotation_block_def = lit("<**") >> *fannotation >> "**>";
+
+auto const fmodel_def = lit("package") >> x3::lexeme[identifier % "."] >> *ftypecollection;
 
 auto const whitespace
     = x3::blank
@@ -126,7 +101,6 @@ BOOST_SPIRIT_DEFINE(
     ftype,
     version,
     types_set,
-    type_collection);
+    ftypecollection,
+    fmodel);
 }
-
-#endif // PARSER_H

@@ -15,31 +15,38 @@ int main()
     auto first = input.begin();
     auto last = input.end();
 
-    ast::FTypeCollection output;
+    ast::FModel output;
 
-    x3::phrase_parse(first, last, fidl::type_collection, fidl::whitespace, output);
+    int i = 0;
+    x3::phrase_parse(first, last, fidl::fmodel, fidl::whitespace, output);
     if (first != last) {
         cout << endl << "Parsing failed at " << (first - input.begin()) << " of " << (last - input.begin()) << endl;
         cout << endl << "Not parsed part: <=" << endl << string(first, last);
         cout << "=>" << endl;
     } else {
-        cout << endl << "Parsing succeeded: got typeCollection " << output.name;
-        if (!output.version) {
-            cout << " without version specifier";
-        } else {
-            ast::FVersion ver = output.version.get();
-            cout << " version " << ver.major << "." << ver.minor;
+        cout << endl << "Successfully parsed fidl package " << output.getPackageName() << ", got " << output.typeCollections.size() << " typecollection";
+        if (output.typeCollections.size() > 1) {
+            cout << "s";
+        }
+        cout << endl;
+        for (const ast::FTypeCollection &tc : output.typeCollections) {
+            cout << "TypeCollection " << tc.name;
+            if (!tc.version) {
+                cout << " without version specifier";
+            } else {
+                ast::FVersion ver = tc.version.get();
+                cout << " version " << ver.major << "." << ver.minor;
+            }
+            cout << endl << endl << "Element count: " << tc.types.size() << endl;
+
+            for(const auto &element : tc.types) {
+                cout << "Element " << ++i << ": " << element;
+                cout << endl;
+            }
         }
     }
     cout << endl << "Known types: ";
     fidl::known_type.for_each([](string s, string ) { std::cout << s << " "; });
-
-    cout << endl << endl << "Output size " << output.types.size() << endl;
-    int i = 0;
-    for(const auto &element : output.types) {
-        cout << "element " << ++i << " = " << element;
-        cout << endl;
-    }
 
     return 0;
 }

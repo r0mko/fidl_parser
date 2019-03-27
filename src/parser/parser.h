@@ -1,4 +1,11 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
-#endif // PARSER_H
+#include "fidl.h"
+#include "fdepl.h"
+
+class FrancaParser
+{
+public:
+    FrancaParser() {}
+    static std::string readFile(const std::string &filename, bool &ok);
+};

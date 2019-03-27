@@ -1,4 +1,5 @@
 #include "ast.h"
+#include <boost/algorithm/string/join.hpp>
 
 bool ast::FTypeCollection::hasType(const std::string &name) const {
     auto it = std::find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
@@ -63,8 +64,6 @@ std::string ast::FType::to_string::operator()(ast::FEnum e) const {
 
 std::string ast::FType::to_string::operator()(ast::FTypeDef t) const {
     ostringstream out;
-
-
     out << "typedef " << t.name << " -> " << t.type;
     return out.str();
 }
@@ -74,8 +73,22 @@ ast::DefinitionType ast::FType::getType() const
     return boost::apply_visitor(get_type(), *this);
 }
 
-std::string ast::FType::getName() const { return boost::apply_visitor(get_name(), *this); }
+std::string ast::FType::getName() const
+{
+    return boost::apply_visitor(get_name(), *this);
+}
 
-bool ast::FType::hasAnnotations() const { return boost::apply_visitor(get_annotation(), *this).is_initialized(); }
+bool ast::FType::hasAnnotations() const
+{
+    return boost::apply_visitor(get_annotation(), *this).is_initialized();
+}
 
-ast::FAnnotationBlock ast::FType::getAnnotations() const { return boost::apply_visitor(get_annotation(), *this).get(); }
+ast::FAnnotationBlock ast::FType::getAnnotations() const
+{
+    return boost::apply_visitor(get_annotation(), *this).get();
+}
+
+std::string ast::FModel::getPackageName() const
+{
+    return boost::algorithm::join(packageName, ".");
+}

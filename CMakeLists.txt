@@ -13,6 +13,7 @@ find_package (Boost 1.65 REQUIRED)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
+include_directories(src/)
 
 add_definitions( -DBOOST_SPIRIT_USE_PHOENIX_V3=1)
 

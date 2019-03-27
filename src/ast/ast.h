@@ -1,4 +1,4 @@
-#ifndef AST_H
-#define AST_H
+#pragma once
 
-#endif // AST_H
+#include "fidl.h"
+#include "fdepl.h"

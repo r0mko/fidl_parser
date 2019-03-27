@@ -4,6 +4,8 @@
 #include <string>
 
 static const std::string input =
+        "package org.adasis.v3\n"
+        "\n"
         "typeCollection Messages {\n"
         "    version {\n"
         "        major 1\n"

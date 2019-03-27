@@ -1,15 +1,15 @@
-#ifndef AST_H
-#define AST_H
+#pragma once
 
 #include <vector>
 #include <string>
 #include <iostream>
 #include <sstream>
+
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/optional/optional.hpp>
-#include <boost/config/warning_disable.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 namespace ast {
 using namespace std;
@@ -112,6 +112,16 @@ struct FTypeCollection
     bool hasType(const string &name) const;
     DefinitionType getTypeByName(const string &name) const;
 };
+
+struct FModel
+{
+    vector<string> packageName;
+    // TODO: imports
+    vector<FTypeCollection> typeCollections;
+    std::string getPackageName() const;
+};
+
+
 }
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -143,5 +153,7 @@ BOOST_FUSION_ADAPT_STRUCT(
         name, version, types
         );
 
-
-#endif // AST_H
+BOOST_FUSION_ADAPT_STRUCT(
+        ast::FModel,
+        packageName, typeCollections
+        );
