@@ -37,7 +37,6 @@ using x3::_val;
 using x3::_attr;
 
 x3::rule<class identifier_id, string> const identifier { "identifier" };
-x3::rule<class identifier_id, string> const text { "text" };
 x3::rule<class fstruct_id, ast::FStruct> const fstruct { "fstruct" };
 x3::rule<class struct_member_id, ast::FStructMember> const struct_member { "struct_member" };
 x3::rule<class polymorphic_clause, string> const polymorphic_clause { "polymorphic_clause" };
@@ -93,21 +92,21 @@ auto const polymorphic_clause_def
 auto const array_braces = lit("[") >> lit("]") >> x3::attr(true);
 
 auto const struct_member_def = known_type >> -array_braces >> identifier;
-auto const fstruct_def = "struct" >> identifier >> -polymorphic_clause >> "{" >> *(struct_member) >> "}";
+auto const fstruct_def =  -fannotation_block >> "struct" >> identifier >> -polymorphic_clause >> "{" >> *(struct_member) >> "}";
 
 auto const enum_member_def = identifier >> -("=" >> int_);
-auto const fenum_def = "enumeration" >> identifier >> "{" >> *(enum_member) >> "}";
+auto const fenum_def = -fannotation_block >> "enumeration" >> identifier >> "{" >> *(enum_member) >> "}";
 
-auto const ftypedef_def = "typedef" >> identifier >> "is" >> known_type;
+auto const ftypedef_def = -fannotation_block >> "typedef" >> identifier >> "is" >> known_type;
 
 auto const version_def = lit("version") >> "{" >> lit("major") >> int_ >> lit("minor") >> int_ >> "}";
 auto const ftype_def = fstruct | ftypedef | fenum;
 auto const types_set_def = *(ftype[add_type]);
 auto const type_collection_def = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
 
-auto const fannotation_def = lit("@") >> identifier >> ":" >> text;
-
-auto const fannotation_block_def = lit("<**") >> +fannotation >> "**>";
+auto const annotation_text = x3::rule<class annotation_text_id, std::string>{} = x3::lexeme[*(x3::char_ - (lit("**>") | lit("@"))) ];
+auto const fannotation_def = lit("@") >> identifier >> ":" >> annotation_text;
+auto const fannotation_block_def = lit("<**") >> *fannotation >> "**>";
 
 auto const whitespace
     = x3::blank
@@ -117,6 +116,8 @@ auto const whitespace
 BOOST_SPIRIT_DEFINE(
     identifier,
     polymorphic_clause,
+    fannotation,
+    fannotation_block,
     struct_member,
     fstruct,
     fenum,

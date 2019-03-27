@@ -15,6 +15,7 @@ namespace ast {
 using namespace std;
 namespace x3 = boost::spirit::x3;
 using boost::optional;
+
 enum DefinitionType {
     Struct,
     TypeDef,
@@ -29,8 +30,12 @@ struct FStructMember
     string name;
 };
 
+using FAnnotation = std::pair<string, string>;
+using FAnnotationBlock = std::vector<FAnnotation>;
+
 struct FTypeBase
 {
+    optional<FAnnotationBlock> annotation;
     string name;
 };
 
@@ -46,8 +51,6 @@ struct FTypeDef : FTypeBase
 };
 
 using FEnum_Member = std::pair<string, boost::optional<int>>;
-using FAnnotation = std::pair<string, string>;
-using FAnnotationBlock = std::vector<FAnnotation>;
 
 struct FEnum : FTypeBase
 {
@@ -71,11 +74,19 @@ private:
         string operator()(FTypeDef f) const { return f.name; }
     };
 
+    struct get_annotation : public boost::static_visitor<optional<FAnnotationBlock>>
+    {
+        optional<FAnnotationBlock> operator()(const FTypeBase &f) const { return f.annotation; }
+    };
+
 public:
     using base_type::base_type;
     using base_type::operator =;
     DefinitionType getType() const { return boost::apply_visitor(get_type(), *this); }
     string getName() const { return boost::apply_visitor(get_name(), *this); }
+
+    bool hasAnnotations() const { return boost::apply_visitor(get_annotation(), *this).is_initialized(); }
+    FAnnotationBlock getAnnotations() const { return boost::apply_visitor(get_annotation(), *this).get(); }
 
     struct to_string : public boost::static_visitor<string>
     {
@@ -128,6 +139,12 @@ public:
 ostream & operator << (ostream &out, FType t)
 {
     out << boost::apply_visitor(FType::to_string(), t);
+    if (t.hasAnnotations()) {
+        out << "\nannotations for " << t.getName() << ":" << endl;
+        for (auto e : t.getAnnotations()) {
+            out << e.first << ": " << e.second << endl;
+        }
+    }
     return out;
 }
 
@@ -159,17 +176,17 @@ BOOST_FUSION_ADAPT_STRUCT(
         );
 BOOST_FUSION_ADAPT_STRUCT(
     ast::FStruct,
-    name, polymorphic, members
+    annotation, name, polymorphic, members
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast::FTypeDef,
-    name, type
+    annotation, name, type
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast::FEnum,
-    name, members
+    annotation, name, members
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
