@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(spirit_parser)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (UNIX)
     set(BOOST_ROOT "/opt/local/include")
@@ -14,8 +16,9 @@ endif()
 
 add_definitions( -DBOOST_SPIRIT_USE_PHOENIX_V3=1)
 
-file( GLOB SRC_FILES src/* )
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+file(GLOB_RECURSE SRCS src/*.cpp)
+file(GLOB_RECURSE HDRS src/*.h)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
+ADD_EXECUTABLE(${PROJECT_NAME} ${SRCS} ${HDRS})
+
+

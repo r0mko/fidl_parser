@@ -1,51 +1,11 @@
 #include <iostream>
 #include <map>
 
-#include "ast.h"
-#include "parser.h"
+#include "ast/ast.h"
+#include "parser/parser.h"
 #include "constants.h"
 
 using namespace std;
-
-//const string input =
-//        "typedef Timestamp is UInt64            \n"
-//        "                                       \n"
-//        "enumeration LandmarkObjectType {       \n"
-//        "    Sign                               \n"
-//        "    Pole                               \n"
-//        "    PerpendicularWall                  \n"
-//        "}                                      \n"
-//        "enumeration LandmarkObjectSignShape {  \n"
-//        "    Triangle = 0                       \n"
-//        "    Rectangle = 1                      \n"
-//        "    Round = 2                          \n"
-//        "    Octagon = 3                        \n"
-//        "    Diamond = 4                        \n"
-//        "    CrossBuck = 5                      \n"
-//        "    Yield = 6                          \n"
-//        "    Ellipse = 7                        \n"
-//        "    Other = 8                          \n"
-//        "    Unknown = 15                       \n"
-//        "}                                      \n"
-//        "struct Vector {                        \n"
-//        "    Float x                            \n"
-//        "    Float y                            \n"
-//        "    Float z                            \n"
-//        "}                                      \n"
-//        "                                       \n"
-//        "struct Foo polymorphic {               \n"
-//        "    Timestamp date                     \n"
-//        "    Vector direction                   \n"
-//        "    Vector[] directions                \n"
-//        "}                                      \n"
-//        "                                       \n"
-//        "typedef MyVector is Foo                \n"
-//        "struct Bar extends Foo                 \n"
-//        "{                                      \n"
-//        "    Vector v                           \n"
-//        "    UInt64 [] zahl                     \n"
-//        "    LandmarkObjectSignShape shape      \n"
-//        "}                                      \n";
 
 int main()
 {
@@ -76,11 +36,10 @@ int main()
 
     cout << endl << endl << "Output size " << output.types.size() << endl;
     int i = 0;
-    for(auto element : output.types) {
+    for(const auto &element : output.types) {
         cout << "element " << ++i << " = " << element;
         cout << endl;
     }
-
 
     return 0;
 }

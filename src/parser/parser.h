@@ -6,7 +6,7 @@
 #include <boost/spirit/home/x3.hpp>
 #include <string>
 #include <iostream>
-#include "ast.h"
+#include "../ast/ast.h"
 
 template <typename T>
 std::string getTypeName(const T &v) {
