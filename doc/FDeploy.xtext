@@ -1,0 +1,341 @@
+/*******************************************************************************
+* Copyright (c) 2012 Harman International (http://www.harman.com).
+* Copyright (c) 2018 itemis AG (http://www.itemis.de).
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* 2012-03-06: Klaus Birken (initial version)
+*******************************************************************************/
+grammar org.franca.deploymodel.dsl.FDeploy with org.eclipse.xtext.common.Terminals
+
+// the fDeploy ecore model (it is not generated from this grammar)
+import "http://www.franca.org/deploymodel/dsl/FDeploy"
+
+// the Franca IDL ecore model
+import "http://core.franca.org" as fidl
+
+// the Ecore ecore model
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+
+// **************************************************************
+// model root
+
+FDModel:
+	('package' name=FQN)?
+	(imports+=Import)*
+	(specifications+=FDSpecification)*
+	(deployments+=FDRootElement)*
+	;
+
+Import :
+	'import' (importURI=STRING|importedSpec=FQN);
+	
+
+// **************************************************************
+// property definition (meta part)
+
+FDSpecification:
+	'specification' name=FQN ('extends' base=[FDSpecification|FQN])? '{'
+		(declarations+=FDDeclaration)*
+	'}';
+
+FDDeclaration: 
+	'for' host=PROPERTY_HOST '{'
+		properties+=FDPropertyDecl*
+	'}';
+
+PROPERTY_HOST returns FDPropertyHostType:
+	ID;
+
+FDPropertyDecl:
+	name=ID ':' type=FDTypeRef
+		('(' flags+=FDPropertyFlag (',' flags+=FDPropertyFlag)* ')')?
+	';' ;
+
+FDPropertyFlag:
+	optional='optional' |
+	'default:' default=FDComplexValue;
+
+
+// **************************************************************
+// deployment model type system
+
+FDTypeRef:
+	(predefined=FDPredefinedTypeId | complex=FDType) (array='[]')?;
+
+enum FDPredefinedTypeId:
+	Integer | String | Boolean | Interface;
+
+FDType:
+	FDEnumType | FDExtensionType;
+
+FDEnumType:
+	'{' enumerators+=FDEnumerator (',' enumerators+=FDEnumerator)* '}';
+
+FDEnumerator:
+	name=ID;
+
+FDExtensionType:
+	name=ID;
+
+// **************************************************************
+// content definition (model part)
+
+FDRootElement:
+	FDExtensionRoot | FDTypes | FDInterface;
+
+FDElement:
+	FDRootElement |
+	FDExtensionElement |
+	FDAttribute | FDOperation | FDArgument |
+	FDTypeDefinition | FDField | FDEnumeration | FDEnumValue |
+	FDMapKey | FDMapValue;
+
+FDAbstractExtensionElement:
+	FDExtensionRoot | FDExtensionElement;
+	
+FDExtensionRoot:
+	'define' spec=[FDSpecification|FQN]
+	'for' tag=ID (target=[ecore::EObject|FQN])? ('as' name=FQN)?
+	'{'
+		('use' use+=[FDRootElement|FQN])*
+
+		// the own properties of this root element
+		properties=FDPropertySet
+		
+		// child elements of this root
+		elements+=FDExtensionElement*
+	'}';
+
+FDExtensionElement:
+	tag=ID (target=[ecore::EObject|FQN])? ('as' name=FQN)? '{'
+		// own properties
+		properties=FDPropertySet
+		
+		// child elements
+		elements+=FDExtensionElement*
+	'}';
+
+FDTypes:
+	'define' spec=[FDSpecification|FQN]
+	'for' 'typeCollection' target=[fidl::FTypeCollection|FQN]
+	('as' name=FQN)?
+	'{'
+		('use' use+=[FDRootElement|FQN])*
+		
+		// the own properties of this typeCollection
+		properties=FDPropertySet
+
+		// properties for all type definitions in the package		
+		types+=FDTypeDefinition*
+	'}';
+
+FDInterface:
+	'define' spec=[FDSpecification|FQN]
+	'for' 'interface' target=[fidl::FInterface|FQN]
+	('as' name=FQN)?
+	'{'
+		('use' use+=[FDRootElement|FQN])*
+
+		// the own properties of this interface
+		properties=FDPropertySet
+		
+		// properties for the interface's elements
+		(
+			attributes+=FDAttribute |		
+			methods+=FDMethod |
+			broadcasts+=FDBroadcast |
+			types+=FDTypeDefinition
+		)*
+	'}';
+
+FDAttribute:
+	'attribute' target=[fidl::FAttribute|FQN] '{'
+		properties=FDPropertySet
+		(overwrites=FDTypeOverwrites)?
+	'}';
+
+FDOperation:
+	FDMethod | FDBroadcast;
+
+FDMethod:
+	'method' target=[fidl::FMethod|FQN_WITH_SELECTOR] '{'
+		properties=FDPropertySet
+		('in' inArguments=FDArgumentList)?
+		('out' outArguments=FDArgumentList)?
+	'}';
+
+FDBroadcast:
+	'broadcast' target=[fidl::FBroadcast|FQN_WITH_SELECTOR] '{'
+		properties=FDPropertySet
+		('out' outArguments=FDArgumentList)?
+	'}';
+
+FDArgumentList:
+	{FDArgumentList}
+	'{' arguments+=FDArgument* '}';
+
+FDArgument:
+	target=[fidl::FArgument|FQN] '{'
+		properties=FDPropertySet
+		(overwrites=FDTypeOverwrites)?
+	'}';
+
+
+FDTypeDefinition: FDArray | FDCompound | FDEnumeration | FDTypedef | FDMap;
+FDCompound: FDStruct | FDUnion;
+
+FDArray:
+	'array' target=[fidl::FArrayType|FQN] '{'
+		properties=FDPropertySet
+		(overwrites=FDTypeOverwrites)?
+	'}';
+	
+FDStruct:
+	'struct' target=[fidl::FStructType|FQN] '{'
+		properties=FDPropertySet
+		fields+=FDField*
+	'}';
+
+FDUnion:
+	'union' target=[fidl::FUnionType|FQN] '{'
+		properties=FDPropertySet
+		fields+=FDField*
+	'}';
+
+FDTypedef:
+	'typedef' target=[fidl::FTypeDef|FQN] '{'
+		properties=FDPropertySet
+	'}';
+	
+FDField:
+	target=[fidl::FField|FQN] '{'
+		properties=FDPropertySet
+		(overwrites=FDTypeOverwrites)?
+	'}';
+
+FDEnumeration:
+	'enumeration' target=[fidl::FEnumerationType|FQN] '{'
+		properties=FDPropertySet
+		enumerators+=FDEnumValue*
+	'}';
+
+FDEnumValue:
+	target=[fidl::FEnumerator|FQN] '{'
+		properties=FDPropertySet
+	'}';
+
+FDMap:
+	'map' target=[fidl::FMapType|FQN] '{'
+		properties=FDPropertySet
+		(key=FDMapKey)?		
+		(value=FDMapValue)?		
+	'}';
+
+FDMapKey:
+	'key' '{'
+		properties=FDPropertySet
+		//(overwrites=FDTypeOverwrites)?
+	'}';
+	
+FDMapValue:
+	'value' '{'
+		properties=FDPropertySet
+		//(overwrites=FDTypeOverwrites)?
+	'}';
+	
+FDTypeOverwrites:
+	'#'            FDPlainTypeOverwrites |
+	'#struct'      FDStructOverwrites |
+	'#union'       FDUnionOverwrites |
+	'#enumeration' FDEnumerationOverwrites;
+
+FDPlainTypeOverwrites:
+	{FDPlainTypeOverwrites}
+	'{'
+		properties=FDPropertySet // the actually overwritten properties
+	'}';
+
+FDStructOverwrites:
+	'{'
+		properties=FDPropertySet // the actually overwritten properties
+		(fields+=FDField)*
+	'}';
+
+FDUnionOverwrites:
+	'{'
+		properties=FDPropertySet // the actually overwritten properties
+		(fields+=FDField)*
+	'}';
+
+FDEnumerationOverwrites:
+	{FDEnumerationOverwrites}
+	'{'
+		properties=FDPropertySet // the actually overwritten properties
+		(enumerators+=FDEnumValue)*
+	'}';
+
+
+// **************************************************************
+// property definition 
+
+FDPropertySet:
+	{FDPropertySet}
+	(items+=FDProperty ((',')? items+=FDProperty)*)?;
+
+FDProperty:
+	decl=[FDPropertyDecl|ID] '=' value=FDComplexValue;
+
+FDComplexValue:
+	single=FDValue | array=FDValueArray;
+
+FDValueArray:
+	'{' values+=FDValue (',' values+=FDValue)* '}';
+
+// a typed constant value 
+FDValue:
+	FDInteger | FDString | FDBoolean | FDInterfaceRef | FDGeneric;
+	
+FDInteger:	    value=SignedInt;
+FDString:	    value=STRING;
+FDBoolean:      value=('false'|'true');
+FDInterfaceRef: '&' value=[fidl::FInterface|FQN];
+
+// FDGeneric.value might be one of:
+//   - [FDEnumerator|ID]
+//   - [FDInterfaceInstance|FQN]
+// See FDModelUtils for some helper functions.
+FDGeneric:      value=[ecore::EObject|FQN];
+
+
+// **************************************************************
+// general
+
+FQN:
+	ID ('.' ID)*;
+
+// this is used for referencing overloaded FMethod and FBroadcast
+FQN_WITH_SELECTOR:
+	FQN (':' ID)?;
+
+// positive or negative integer
+SignedInt returns ecore::EInt:
+	NEGATIVE_INT | INT | HEX | BINARY;
+
+// terminal rule: negative integer
+terminal NEGATIVE_INT returns ecore::EInt:
+	'-' ('0'..'9')+;
+
+// terminal rule: hexadecimal literal
+terminal HEX:
+	 ('0x'|'0X')(('0'..'9')|('a'..'f')|('A'..'F'))+;
+
+// terminal rule: binary literal
+terminal BINARY:
+	 ('0b'|'0B')('0'|'1')+;
+	
+
+// **************************************************************
