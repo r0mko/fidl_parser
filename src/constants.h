@@ -3,6 +3,398 @@
 
 #include <string>
 
+static const std::string fdepl_string = R"(
+import "ADASISv3Messages.fidl"
+
+define org.adasis.v3.Spec for typeCollection org.adasis.v3.Messages
+{
+    MaxPaths = 56
+
+    enumeration ProfileType {
+        Node {
+            InterpolationType = Spot
+        }
+        Probability {
+            InterpolationType = Step
+        }
+        HeadingChange {
+            InterpolationType = Spot
+        }
+        LaneModel {
+            InterpolationType = Spot
+        }
+        LaneConnectivity {
+            InterpolationType = Spot
+        }
+        LinearObjects {
+            InterpolationType = Spot
+        }
+        LanesGeometry {
+            InterpolationType = Spot
+        }
+        LaneWidth{
+            InterpolationType = Step
+        }
+        RoadGeometry{
+            InterpolationType = Spot
+        }
+        NumberOfLanesPerDirection {
+            InterpolationType = Step
+        }
+        ComplexIntersection {
+            InterpolationType = Step
+        }
+        LinkIdentifier {
+            InterpolationType = Step
+        }
+        FunctionalRoadClass {
+            InterpolationType = Step
+        }
+        RouteNumberTypes {
+            InterpolationType = Step
+        }
+        FormOfWay {
+            InterpolationType = Step
+        }
+        RoadAccessibility {
+            InterpolationType = Step
+        }
+        AccessRestriction {
+            InterpolationType = Step
+        }
+        OvertakingRestriction {
+            InterpolationType = Step
+        }
+        Tunnel {
+            InterpolationType = Step
+        }
+        Bridge {
+            InterpolationType = Step
+        }
+        DividedRoad {
+            InterpolationType = Step
+        }
+        Curvature {
+            InterpolationType = Special
+        }
+        Slope {
+            InterpolationType = Special
+        }
+        BuiltUpArea {
+            InterpolationType = Step
+        }
+        InTown {
+            InterpolationType = Step
+        }
+        Surface {
+            InterpolationType = Step
+        }
+        TrafficSign {
+            InterpolationType = Spot
+        }
+        TrafficLight {
+            InterpolationType = Spot
+        }
+        SpecialSituation {
+            InterpolationType = Spot
+        }
+        EffectiveSpeedLimit {
+            InterpolationType = Step
+        }
+        AverageSpeed {
+            InterpolationType = Step
+        }
+        FlowSpeed {
+            InterpolationType = Step
+        }
+        RoadCondition {
+            InterpolationType = Step
+        }
+        Weather {
+            InterpolationType = Step
+        }
+        LocationObject {
+            InterpolationType = Spot
+        }
+        PartOfCalculatedRoute {
+            InterpolationType = Step
+        }
+        CountryCode {
+            InterpolationType = Step
+        }
+        RegionCode {
+            InterpolationType = Step
+        }
+        DrivingSide {
+            InterpolationType = Step
+        }
+        UnitSystem {
+            InterpolationType = Step
+        }
+        VersionProtocol {
+            InterpolationType = Step
+        }
+        VersionHardware {
+            InterpolationType = Step
+        }
+        VersionMap {
+            InterpolationType = Step
+        }
+        MapAge {
+            InterpolationType = Step
+        }
+        MapProvider {
+            InterpolationType = Step
+        }
+        MapStatus {
+            InterpolationType = Step
+        }
+        SystemStatus {
+            // Global only, no meaningful interpolation!
+            InterpolationType = Step
+        }
+        TimeZoneOffset {
+            InterpolationType = Step
+        }
+        AbsoluteVehiclePosition {
+            // Global only, no meaningful interpolation!
+            InterpolationType = Step
+        }
+
+        // custom ProfileTypes
+        MapMatchingStatus {
+            InterpolationType = Step
+        }
+        AdminRoadClass {
+            InterpolationType = Step
+        }
+        RoadSideBarrier {
+            InterpolationType = Spot
+        }
+        RoadReferenceLine {
+            InterpolationType = Spot
+        }
+        Landmark {
+            InterpolationType = Spot
+        }
+        VersionInfo {
+            InterpolationType = Step
+        }
+        MovableBridge {
+            InterpolationType = Step
+        }
+        Unknown {
+            InterpolationType = Spot
+        }
+    }
+
+    struct ProfileEntry {
+        instanceId {
+            IsOptional = true
+        }
+        direction {
+            IsOptional = true
+        }
+    }
+
+    // Tags for message structures.
+    struct AdasisMessageBase {
+        Tag = 1
+    }
+    struct PositionMessage {
+        Tag = 2
+    }
+    struct ProfileMessage {
+        Tag = 4
+      }
+      struct GlobalDataMessage {
+        Tag = 5
+      }
+      struct ProfileControlMessage {
+         Tag = 6
+      }
+      struct PathControlMessage {
+         Tag = 7
+      }
+      
+      // Tags for profile value structures.
+      struct ProfileValue {
+         Tag = 100
+      }
+      struct UInt32ProfileValue {
+         Tag = 101
+      }
+      struct Int32ProfileValue {
+         Tag = 102
+      }
+      struct UInt64ProfileValue {
+         Tag = 103
+      }
+      struct FloatProfileValue {
+         Tag = 104
+      }
+      struct BooleanProfileValue {
+         Tag = 105
+      }
+      struct YesNoUnknownProfileValue {
+         Tag = 111
+      }
+      struct FormOfWayProfileValue {
+         Tag = 112
+      }
+      struct DrivingSideProfileValue {
+         Tag = 113
+      }
+      struct UnitSystemProfileValue {
+         Tag = 114
+      }
+      struct SpecialSituationProfileValue {
+         Tag = 115
+      }
+      struct RoadConditionProfileValue {
+         Tag = 116
+      }
+      struct WeatherProfileValue {
+         Tag = 117
+      }
+      struct MapProviderProfileValue {
+         Tag = 118
+      }
+      struct MapStatusProfileValue {
+         Tag = 119
+      }
+      struct NodeProfileValue {
+         Tag = 151
+      }
+      struct SystemStatusProfileValue {
+         Tag = 152
+      }
+      struct AbsoluteVehiclePositionProfileValue {
+         Tag = 153
+      }
+      struct SurfaceConditionProfileValue {
+         Tag = 154
+      }
+      struct SpeedProfileValue {
+         Tag = 155
+      }
+      struct LaneModelValue {
+         Tag = 156
+      }
+      struct LaneConnectivityValue {
+         Tag = 157
+      }
+      struct LinearObjectDefinitionValue {
+         Tag = 158
+      }
+      struct LanesGeometryProfileValue {
+         Tag = 159
+      }
+      struct RoadGeometryProfileValue {
+         Tag = 160
+      }
+      struct TrafficLightProfileValue {
+         Tag = 161
+      }
+      struct EffectiveSpeedLimit {
+         Tag = 162
+      }
+      struct LocationObject {
+         Tag = 163
+      }
+      struct RegionCodeValue {
+         Tag = 164
+            value {
+            MaxSize = 3
+               Inline = true
+         }
+      }
+      struct ExtendedSpeedLimitValue {
+         Tag = 165
+            conditions {
+            MaxSize = 5
+         }
+      }
+      struct TrafficSignValue {
+         Tag = 166
+            panels {
+            MaxSize = 5
+         }
+      }
+      struct OffsetFloatProfileValue {
+         Tag = 500
+      }
+      struct ConditionalRestrictionProfileValue {
+         Tag = 501
+      }
+      
+      // Tags for Condition structures
+      struct Condition {
+         Tag = 200
+      }
+      struct ConditionNumeric {
+         Tag = 201
+      }
+      struct ConditionVehicleType {
+         Tag = 202
+      }
+      struct ConditionLoad {
+         Tag = 203
+      }
+      struct ConditionTimeOfDay {
+         Tag = 204
+      }
+      struct ConditionWeather {
+         Tag = 205
+      }
+      struct ConditionFuzzyTime {
+         Tag = 206
+      }
+      struct ConditionTurnDirection {
+         Tag = 207
+      }
+      
+      // Tags for Daimler structures
+      // Tags for profile value structures
+      struct VersionInfoProfileValue {
+         Tag = 1000
+      }
+      
+      struct MapMatchingStatusProfileValue {
+         Tag = 1002
+      }
+      
+      struct UInt8ProfileValue {
+         Tag = 1004
+      }
+      
+      struct RoadSideBarrierProfileValue {
+         Tag = 1005
+      }
+      
+      struct RoadReferenceLineProfileValue {
+         Tag = 1006
+      }
+      
+      struct LandmarkProfileValue {
+         Tag = 1007
+      }
+      
+      // Tags for LandmarkObjectDetails structures
+      struct LandmarkObjectDetails {
+         Tag = 1008
+      }
+      struct LandmarkObjectSignDetails {
+         Tag = 1009
+      }
+      struct LandmarkObjectPoleDetails {
+         Tag = 1010
+      }
+      struct LandmarkObjectPerpendicularWallDetails {
+         Tag = 1011
+      }
+      })";
+
 static const std::string input =
         "package org.adasis.v3\n"
         "\n"

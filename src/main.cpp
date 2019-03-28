@@ -11,6 +11,13 @@ int main()
 {
     namespace x3 = boost::spirit::x3;
     using namespace std;
+    
+    auto begin = fdepl_string.begin();
+    auto end = fdepl_string.end();
+    
+    fdepl::fdepl_define_type output1;
+    x3::phrase_parse(begin, end, fdepl::fdepl_define, fdepl::whitespace, output1);
+    return 0;
 
     auto first = input.begin();
     auto last = input.end();
