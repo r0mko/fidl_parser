@@ -64,6 +64,19 @@ auto const whitespace
    | x3::lexeme[ "//" >> *(x3::char_ - x3::eol) >> x3::eol ]
    | x3::eol;
 
+template<typename T>
+void introspect(T &ctx) {
+   cout << "attr type: " << getTypeName(_attr(ctx)) << endl;
+   cout << "val type: " << getTypeName(_val(ctx)) << endl;
+};
+
+auto introspect_type = [](auto &ctx)
+{
+   introspect(ctx);
+   std::cout<<"FFFFFF"<<std::endl;
+   _val(ctx).push_back(_attr(ctx));
+};
+
 auto const identifier_def = x3::raw[lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
 auto const propvalue_def = bool_ | int_ | double_ | identifier;
 auto const property_def = identifier >> lit("=") >> propvalue;
@@ -72,15 +85,15 @@ auto const fmember_def = identifier >> lit("{") >> propertyset >> lit("}");
 auto const fenum_def = lit("enumeration") >> identifier >> "{" >> *(fmember) >> "}";
 auto const fstruct_def = lit("struct") >> identifier >> "{" >> *(fmember) >> "}";
 auto const fqn_def = identifier % ".";
-auto const import_def = lit("import") >> '"' >> lexeme[ identifier > lit("fidl") ] >> '"';
+auto const import_def = lit("import") >> lexeme['"' >> identifier[introspect_type] >> lit(".fidl") >> '"'];
 auto const data_def = propertyset | fenum | fstruct;
-auto const dataset_def = *(data);
+auto const dataset_def = *(data[introspect_type]);
 auto const fdepl_define_header_def = lit("define") >> fqn >> lit("for") >> lit("typeCollection") >> fqn;
 auto const fdepl_define_def =  fdepl_define_header >>
                                lit("{") >>
                                dataset >>
                                lit("}");
-auto const fdepl_full_def = import >> fdepl_define;
+auto const fdepl_full_def = import[introspect_type] >> fdepl_define[introspect_type];
 
 BOOST_SPIRIT_DEFINE(
    identifier,
