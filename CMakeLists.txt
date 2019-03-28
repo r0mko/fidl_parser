@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(spirit_parser)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
 
 if (UNIX)
     set(BOOST_ROOT "/opt/local/include")
@@ -24,5 +25,3 @@ file(GLOB_RECURSE SRCS src/*.cpp)
 file(GLOB_RECURSE HDRS src/*.h)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SRCS} ${HDRS})
-
-

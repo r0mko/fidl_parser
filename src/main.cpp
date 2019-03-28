@@ -32,8 +32,8 @@ int main(int argc, const char *argv[])
     auto first = input.begin();
     auto last = input.end();
     
-    fdepl::fdepl_define_t output1;
-    x3::phrase_parse(first, last, fdepl::fdepl_define, fdepl::whitespace, output1);
+    fdepl::fdepl_full_t output1;
+    x3::phrase_parse(first, last, fdepl::fdepl_full, fdepl::whitespace, output1);
     return 0;
 
     ast::FModel output;
