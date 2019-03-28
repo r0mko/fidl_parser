@@ -1,0 +1,990 @@
+package org.adasis.v3
+
+typeCollection Messages {
+    version {
+        major 1
+        minor 0
+    }
+
+typedef Angle is Float
+typedef Distance is UInt32
+typedef InstanceId is UInt32
+typedef LaneIdx is UInt8
+typedef LinearObjId is UInt32
+typedef Offset is UInt32
+typedef PathId is UInt32
+typedef Probability is Float
+typedef SignLocationMask is UInt16
+typedef Timestamp is UInt64
+typedef VehicleSpeed is Float
+
+enumeration Availability {
+    NotAvailable
+    Valid
+}
+enumeration ChangeMode {
+    Create
+    Update
+    Delete
+}
+enumeration ConditionType {
+    conditionTypeUnknown
+    conditionTypeVehicle
+    conditionTypeLoad
+    conditionTypeTimeOfDay
+    conditionTypeDaysOfWeek
+    conditionTypeWeight
+    conditionTypeTurnDirection
+    conditionTypeWeather
+    conditionTypeFuzzyTime
+}
+enumeration CurveType {
+    NotPresent
+    Polyline
+    BezierSpline
+}
+enumeration DrivingSide {
+    RightHandDriving = 0
+    LeftHandDriving = 1
+}
+enumeration EffectiveSpeedLimitType {
+    Unknown
+    Implicit
+    ExplicitOnTrafficSign
+    ExplicitNight
+    ExplicitDay
+    ExplicitTimeOrDay
+    ExplicitRain
+    ExplicitSnow
+    ExplicitFog
+}
+enumeration FormOfWay {
+    Unknown = 0
+    ControlledAccess = 1
+    MultipleCarriageWay = 2
+    SingleCarriageWay = 3
+    RoundaboutCircle = 4
+    SpecialTrafficFigure = 5
+    ReservedA = 6
+    ReservedB = 7
+    ParallelRoad = 8
+    RampOnControlledAccess = 9
+    RampNotOnControlledAccess = 10
+    FrontageRoad = 11
+    CarPark = 12
+    Service = 13
+    PedestrianZone = 14
+    NotAvailable = 15
+}
+enumeration FuzzyTime {
+    Unknown
+    Day
+    Night
+}
+enumeration GuidanceMode {
+    guidanceInactive
+    guidanceForUser
+    guidanceAutomatic
+}
+enumeration LaneArrowMarking {
+    None = 0
+    Straight = 1
+    SlightRight = 2
+    Right = 4
+    HardRight = 8
+    UTurn = 16
+    HardLeft = 32
+    Left = 64
+    SlightLeft = 128
+    NA = -1
+}
+enumeration LaneTransition {
+    None
+    Opening
+    Closing
+    Merging
+    Splitting
+}
+enumeration LaneTypeFlags {
+    Unknown = 0
+    Normal = 1
+    Exit = 2
+    Entry = 4
+    Auxiliary = 8
+    Emergency = 16
+    RestrictedForbidden = 32
+    RestrictedUsable = 64
+    HOV = 128
+    Express = 256
+    Reversible = 512
+    Slow = 1024
+    DrivableShoulder = 2048
+    TurnOrSuicide = 4096
+
+    // Daimler change
+    SoftShoulder = 8192
+    EmergencyBay = 16384
+}
+enumeration LateralPosition {
+    Unknown = 0
+    Right = 1
+    Left = 2
+    Above = 4
+    Surface = 8
+}
+enumeration LineMarking {
+    Unknown
+    None
+    SolidLine
+    DashedLine
+    DoubleSolidLine
+    DoubleDashedLine
+    LeftSolidRightDashed
+    RightSolidLeftDashed 
+    DashedBlocks
+    ShadedArea
+    PhysicalDivider
+}
+enumeration LineMarkingColour {
+    None
+    Other
+    White
+    Yellow
+    Orange
+    Red
+    Blue
+}
+enumeration LinearObjectType {
+    Centerline
+    LaneMarking
+    Guardrail
+    Fence
+    Kerb
+    Wall
+}
+enumeration Load {
+    loadWaterPolluting
+    loadExplosive
+    loadOtherDangerous
+    loadEmpty
+    loadSpecial
+    loadGasses
+    loadFlammableLiquids
+    loadFlammableSolids
+    loadOxidizing
+    loadToxicInfectious
+    loadRadioactive
+    loadCorrosive
+}
+enumeration LocationObjectType {
+    GuidePost
+}
+enumeration MapProvider {
+    provider_Unknown
+    provider_AND
+    provider_AutoNavi
+    provider_HERE
+    provider_Hyundai
+    provider_Navinfo
+    provider_TomTom
+    provider_Zenrin
+}
+enumeration MapStatus {
+    mapNotAvailable
+    mapLoading
+    mapAvailable
+}
+enumeration MessageType {
+    Position
+    Profile
+    GlobalData
+    ProfileControl
+    PathControl
+}
+enumeration ProfileType {
+    Node
+    Probability
+    HeadingChange
+    LaneModel
+    LaneConnectivity
+    LinearObjects
+    LanesGeometry
+    LaneWidth
+    RoadGeometry 
+    NumberOfLanesPerDirection
+    ComplexIntersection
+    LinkIdentifier
+    FunctionalRoadClass
+    RouteNumberTypes
+    FormOfWay
+    RoadAccessibility
+    AccessRestriction
+    OvertakingRestriction
+    Tunnel
+    Bridge
+    DividedRoad
+    Curvature
+    Slope
+    BuiltUpArea
+    InTown
+    Surface
+    TrafficSign
+    TrafficLight
+    SpecialSituation
+    EffectiveSpeedLimit
+    ExtendedSpeedLimit
+    AverageSpeed
+    FlowSpeed
+    RoadCondition
+    Weather
+    LocationObject
+    PartOfCalculatedRoute
+    CountryCode
+    RegionCode
+    DrivingSide
+    UnitSystem
+    VersionProtocol
+    VersionHardware
+    VersionMap
+    MapAge
+    MapProvider
+    MapStatus
+    SystemStatus
+    TimeZoneOffset
+    AbsoluteVehiclePosition
+
+    // Daimler change
+    MapMatchingStatus       // Data type: MapMatchingStatus, Interpolation: Step
+    AdminRoadClass          // Data type: UInt8, Interpolation: Step
+    RoadSideBarrier         // Data type: RoadSideBarrierProfileValue
+    RoadReferenceLine       // Data type: RoadReferenceLineProfileValue
+    Landmark                // Data type: LandmarkProfileValue
+    VersionInfo             // Data type: VersionInfoProfileValue, Interpolation: Step
+    MovableBridge           // Data type: Boolean, Interpolation: Step
+    Unknown
+}
+enumeration Quality {
+    Unknown
+    NotAvailable
+    Value1
+    Value2
+    Value3
+    Value4
+    Value5
+}
+
+enumeration RelativeDirection {
+    None
+    Both
+    AlongPathDirection
+    AgainstPathDirection
+}
+enumeration RightOfWay {
+    Unknown
+    MustYield
+    HasRightOfWay
+}
+enumeration RoadAccessFlags {
+    PassengerCars = 1
+    Pedestrians = 2
+    Bus = 4
+    Delivery = 8
+    Emergency = 16
+    Taxi = 32
+    ThroughTraffic = 64
+    Trucks = 128
+    Bicycles = 256      // Daimler change
+}
+enumeration RoadCondition {
+    Unknown
+    Clear
+    Wet
+    Snowy
+    Icy
+    Slippery
+    Dirt
+}
+enumeration SignType {
+    Unknown = 255
+    LeftBend = 10
+    RightBend = 9
+    DoubleBendLeftFirst = 14
+    DoubleBendRightFirst = 13
+    CurvyRoad = 17
+    SteepDescent = 68
+    SteepAscent = 67
+    CarriageWayNarrows = 40
+    CarriageWayNarrowsLeft = 42
+    CarriageWayNarrowsRight = 41
+    SwingBridge = 89
+    RiverBank = 29
+    RiverBankLeft = 30
+    UnevenRoad = 69
+    Hump = 70
+    Dip = 71
+    SlipperyRoad = 66
+    FallingRocksRight = 62
+    FallingRocksLeft = 61
+    Pedestrians = 50
+    PedestrianCrossing = 51
+    Children = 52
+    SchoolZone = 53
+    Cyclists = 54
+    DomesticAnimalsCrossing = 4 
+    WildAnimalsCrossing = 5
+    RoadWorks = 6
+    LightSignals = 31
+    DangerousIntersection = 22
+    Intersection = 35
+    IntersectionWithPriorityToTheRight = 37
+    IntersectionWithMinorRoad = 36 
+    TwoWayTraffic = 55
+    TafficCongestion = 75
+    RailwayCrossingWithGates = 56
+    RailwayCrossingWithoutGates = 57
+    TramWay = 59
+    RailwayCrossing = 58
+    Danger = 0
+    GiveWay = 32
+    Stop = 33
+    PriorityRoad = 34
+    PriorityForOncomingTraffic = 82 
+    PriorityOverOncomingTraffic = 81
+    OvertakingProhibited = 46
+    OvertakingByGoodsVehiclesProhibited = 20 
+    SpeedLimit = 87
+    EndOfAllProhibitions = 79
+    EndOfSpeedLimit = 88
+    EndOfProhibitionOnOvertaking = 47 
+    EndOfProhibitionOnOvertakingForGoodsVehicles = 21 
+    DirectionToTheRight = 38
+    DirectionToTheLeft = 39
+    PassRightSide = 3
+    PassLeftOrRightSide = 1
+    PassLeftSide = 2
+    BeginningOfBuiltUpArea = 77 
+    EndOfBuiltUpArea = 83
+    Tunnel = 24
+    ResidentialArea = 7 
+    EndOfResidentialArea = 8 
+    LaneMergeRight = 44
+    LaneMergeLeft = 43
+    ProtectedPassingEnd = 48
+    HumpbackBridge = 28
+    VariableSignMechanicElements = 65
+    VariableSignLightElements = 80
+    FerryTerminal = 25
+    NarrowBridge = 26
+    IcyRoad = 73
+    SteepDropLeft = 63
+    SteepDropRight = 64
+    RoadFloods = 72
+    SideWinds = 74
+    LaneMergeCenter = 45
+    HighAccidentArea = 76
+    AudibleWarning = 78
+}
+enumeration SpecialSituationType {
+    DeadEnd = 248
+    FerryTerminal = 249
+    TollBooth = 250
+    RailroadCrossing = 251
+    PedestrianCrossing = 252
+    SpeedBump = 253
+}
+enumeration SpeedLimitSource {
+    Unknown
+    Implicit
+    Explicit
+}
+enumeration SurfaceCondition {
+    Unknown
+    PavedRigid
+    PavedFlexible
+    Blocks
+    Gravel
+    Dirt
+}
+enumeration TrafficLightLongitudinalPosition {
+    Unknown
+    BeforeIntersection
+    AfterIntersection
+}
+enumeration TrafficLightState {
+    Unknown
+    Invalid
+    Off
+    Green
+    Yellow
+    Red
+}
+enumeration UnitOfSpeed {
+    KpH
+    MpH
+}
+enumeration Weather {
+    Unknown
+    NoSpecial
+    Sunshine
+    Rain
+    Fog
+    Snow
+    Ice
+    StrongWind
+}
+enumeration YesNoUnknown {
+    Unknown
+    Yes
+    No
+}
+struct Vector {
+    Float x
+    Float y
+    Float z
+}
+struct Speed {
+    UInt8 value
+    UnitOfSpeed unit
+}
+struct WGS84Point {
+    Int32 latitude
+    Int32 longitude
+    Int32 altitude
+}
+struct VehiclePosition {
+    WGS84Point position // Daimler change: WGS84Point is member of VehiclePosition
+    Timestamp timestamp
+    Float heading
+}
+struct Position {
+    PathId pathId
+    Offset offset
+    Distance accuracy
+    Int32 deviation
+    VehicleSpeed speed
+    Angle relativeHeading
+    Probability probability
+    LaneIdx currentLane
+    PathId preferredPath
+}
+struct AdasisMessageBase polymorphic {
+}
+struct PositionMessage extends AdasisMessageBase {
+    Timestamp timestamp
+    Timestamp positionAge
+    Position [] positions
+}
+struct ProfileValue polymorphic {
+}
+struct ProfileEntry {
+    InstanceId instanceId
+    Boolean isRetransmission
+    ChangeMode change
+    Float confidence
+    PathId pathId
+    LaneIdx [] laneNumbers
+    RelativeDirection direction
+    Offset offset
+    Offset endOffset
+    Boolean endOffsetFinal
+    ProfileType type
+    Availability available
+    ProfileValue value
+}
+struct ProfileMessage extends AdasisMessageBase {
+    ProfileEntry [] profiles
+}
+struct GlobalData {
+    ProfileType type
+    Availability available
+    ProfileValue value
+}
+struct GlobalDataMessage extends AdasisMessageBase {
+    GlobalData [] data
+}
+struct ProfileControl {
+    PathId pathId
+    Offset offset
+}
+struct ProfileControlMessage extends AdasisMessageBase {
+    ProfileControl [] values
+}
+struct PathControl {
+    PathId Id
+    PathId parentId
+    Offset offset
+}
+struct PathControlMessage extends AdasisMessageBase {
+    PathId idFirst
+    PathId idLast
+    PathControl [] values
+}
+struct MessageOnBus {
+    UInt8 cyclicCounter
+    MessageType type
+    AdasisMessageBase message
+}
+struct UInt32ProfileValue extends ProfileValue {
+    UInt32 value
+}
+struct Int32ProfileValue extends ProfileValue {
+    Int32 value
+}
+struct UInt64ProfileValue extends ProfileValue {
+    UInt64 value
+}
+struct FloatProfileValue extends ProfileValue {
+    Float value
+}
+struct BooleanProfileValue extends ProfileValue {
+    Boolean value
+}
+struct YesNoUnknownProfileValue extends ProfileValue {
+    YesNoUnknown value
+}
+struct FormOfWayProfileValue extends ProfileValue {
+    FormOfWay value
+}
+struct DrivingSideProfileValue extends ProfileValue {
+    DrivingSide value
+}
+struct UnitSystemProfileValue extends ProfileValue {
+    UnitOfSpeed value
+}
+struct SpecialSituationProfileValue extends ProfileValue {
+    SpecialSituationType value
+}
+struct RoadConditionProfileValue extends ProfileValue {
+    RoadCondition value
+}
+struct WeatherProfileValue extends ProfileValue {
+    Weather value
+}
+struct MapProviderProfileValue extends ProfileValue {
+    MapProvider value
+}
+struct MapStatusProfileValue extends ProfileValue {
+    MapStatus value
+}
+struct OffsetFloatEntry {
+    Offset offset
+    Float value
+}
+struct OffsetFloatProfileValue extends ProfileValue {
+    OffsetFloatEntry [] entries
+}
+struct NodeArm {
+    PathId subPath
+    Probability probability
+    Angle turnAngle
+    Boolean isComplexIntersection
+    RightOfWay rightOfWay
+}
+struct NodeProfileValue extends ProfileValue {
+    NodeArm [] arms
+}
+struct SystemStatusProfileValue extends ProfileValue {
+    GuidanceMode guidance
+    Boolean simulating
+}
+struct AbsoluteVehiclePositionProfileValue extends ProfileValue {
+    VehiclePosition position
+}
+struct SurfaceConditionProfileValue extends ProfileValue {
+    Quality general
+    SurfaceCondition surface
+}
+struct SpeedProfileValue extends ProfileValue {
+    Speed value
+}
+struct LaneInfo {
+    UInt8 laneNumber
+    RelativeDirection direction
+    LaneTransition transition
+    UInt32 types
+    LinearObjId centerline
+    LinearObjId leftBoundary
+    LinearObjId rightBoundary
+}
+struct LaneModelValue extends ProfileValue {
+    UInt8 totalNumberOfLanes
+    LaneInfo [] laneInfos
+}
+struct LaneConnectivityPair {
+    UInt8 initialLaneNumber
+    PathId initialPath
+    UInt8 newLaneNumber
+    PathId newPath
+}
+struct LaneConnectivityValue extends ProfileValue {
+    LaneConnectivityPair [] connectivityPairs
+}
+struct LinearObject {
+    LinearObjId id
+    LinearObjectType type
+    LineMarking marking
+    LineMarkingColour colour
+}
+struct LinearObjectDefinitionValue extends ProfileValue {
+    LinearObject [] linearObjects
+}
+struct Curve {
+    CurveType type
+    WGS84Point [] points
+}
+struct LineGeometry {
+    LinearObjId idLine
+    Curve geometry
+}
+struct LanesGeometryProfileValue extends ProfileValue {
+     LineGeometry [] geometries
+}
+struct RoadGeometryProfileValue extends ProfileValue {
+    Curve roadCenterline
+}
+struct TrafficLightProfileValue extends ProfileValue {
+    TrafficLightLongitudinalPosition longitudinalPosition
+    LateralPosition lateralPosition
+    Double cycleTime
+    TrafficLightState currentState
+    YesNoUnknown turnOnRedAllowed
+    Vector position
+    Vector boundingBox
+}
+struct EffectiveSpeedLimit extends ProfileValue {
+    Speed value
+    EffectiveSpeedLimitType type
+}
+struct LocationObject extends ProfileValue {
+    LocationObjectType type
+    Int32 lateralOffset
+    WGS84Point absolutePosition
+}
+struct RegionCodeValue extends ProfileValue {
+    UInt8 [] value
+}
+struct Condition polymorphic {
+    ConditionType type
+    YesNoUnknown appliesToEgoVehicle
+}
+struct ConditionNumeric extends Condition {
+    UInt32 value
+}
+struct ConditionVehicleType extends Condition {
+    UInt32 vehicleTypeMask
+}
+struct ConditionLoad extends Condition {
+    Load value
+}
+struct ConditionTimeOfDay extends Condition {
+     UInt16 startMinutes
+     UInt16 endMinutes
+}
+struct ConditionWeather extends Condition {
+    Weather weather
+}
+struct ConditionFuzzyTime extends Condition {
+    FuzzyTime fuzzyTime
+}
+struct ConditionTurnDirection extends Condition {
+    LaneArrowMarking direction
+}
+struct ExtendedSpeedLimitValue extends ProfileValue {
+    Speed value
+    SpeedLimitSource source
+    Condition [] conditions
+}
+struct TrafficSignValue extends ProfileValue {
+    SignType type
+    UInt32 value
+    SignLocationMask location
+    Int32 shift
+    Distance distance
+    Distance len        // Length of validity given on additional panel.
+                        // Rename length to len because length is a forbidden keyword
+    YesNoUnknown vms
+    Condition [] panels
+}
+struct ConditionalRestrictionProfileValue extends ProfileValue {
+    Boolean allowed
+    Condition [] conditions
+}
+
+
+// Z. Daimler data types:
+// Version of interface: 1.8
+// Date of last update: 27.07.2018
+// Important note! Do not use these variable names because they are used already in the generated code as local variables:
+//   pos, length, indent, strIndent, result, buffer, count, tag, map
+
+struct UInt8ProfileValue extends ProfileValue {
+    UInt8 value
+}
+
+struct RoadReferenceLineProfileValue extends ProfileValue {
+    LinearObjId idReferenceLine
+}
+
+// Z.0 Version information:
+struct VersionInfoProfileValue extends ProfileValue {
+    UInt8 [] aswRelease            // e.g. E006.0
+    UInt8 [] aswTag                // e.g. HADwas_18.0F04.3
+    UInt8 [] aswCommit             // e.g. 9045cb3
+    UInt8 [] bswRelease            // e.g. E006.0 rc3, K matrix 17_25_a0
+    UInt8 [] hw                    // e.g. B2
+    UInt8 [] fidl                  // e.g. 1.6
+}
+
+// Z.1 MapMatching status:
+enumeration MapMatchingStatus {
+    OffRoadNoCandidates
+    OffRoadWithCandidates
+    MapMatched
+}
+
+struct MapMatchingStatusProfileValue extends ProfileValue {
+    MapMatchingStatus value
+}
+
+// Z.2 Daimler PDU:
+typedef CRC is UInt32
+
+struct PDU_Daimler {
+    CRC crc
+    MessageType typeMsg
+    ProfileType typeProfile    // Used only with Profile and GlobalData messages, else Unknown
+    UInt32 cyclicCounter
+    UInt16 payloadLength       // Length of payload (message)
+    AdasisMessageBase message
+}
+
+struct MessageOnBus_Daimler {
+    PDU_Daimler [] pdus
+}
+
+// Z.3 RoadSide barrier:
+struct WGS84Point2D {
+    Int32 latitude  // East positive, 2^32 is 360 degrees.
+    Int32 longitude // North positive, 2^32 is 360 degrees.
+}
+
+struct Curve2D {
+    CurveType type
+    WGS84Point2D [] points
+}
+
+struct RoadSideBarrier {
+    Curve2D geometry
+    UInt16 heightIndicator // 0.1m resolution, [0 .. 6553.5m] above ground
+}
+
+struct RoadSideBarrierProfileValue extends ProfileValue {
+    RoadSideBarrier [] barriers
+}
+
+// Z.4 Landmark (NDS 2.5.1 FTX LO 1.0):
+struct Covariance {
+    UInt16 varianceXX   // Variance for x var(x)
+    UInt16 varianceYY   // Variance for y var(y)
+    UInt16 varianceZZ   // Variance for z var(z)
+    UInt16 varianceXY   // Covariance for xy cov(x,y)
+}
+
+enumeration LandmarkObjectType {
+    Sign
+    Pole
+    PerpendicularWall
+}
+
+enumeration LandmarkObjectSignShape {
+    Triangle = 0
+    Rectangle = 1
+    Round = 2
+    Octagon = 3
+    Diamond = 4
+    CrossBuck = 5
+    Yield = 6
+    Ellipse = 7
+    Other = 8
+    Unknown = 15
+}
+
+enumeration WarningSign {
+    GeneralHazard = 0
+    PassLeftOrRightOfObstacle = 1
+    PassLeftOfObstacle = 2
+    PassRightOfObstacle = 3
+    Cattle = 4
+    Animals = 5
+    RoadWorks = 6
+    LivingStreetEntry = 7
+    LivingStreetExit = 8
+    CurveRight = 9
+    CurveLeft = 10
+    TruckRollover = 11
+    FogArea = 12
+    CurveRightThenLeft = 13
+    CurveLeftThenRight = 14
+    TireChainsMandatory = 15
+    HijackingHotspot = 16
+    CurvyRoad = 17
+    ReverseBends = 18
+    RoundaboutAhead = 19
+    NoOvertakingForTrucks = 20
+    NoOvertakingForTrucksEnd = 21
+    DangerousIntersection = 22
+    OverPassAhead = 23
+    Tunnel = 24
+    FerryTerminal = 25
+    NarrowBridge = 26
+    NoIdling = 27
+    HumpbackBridge = 28
+    EmbankmentOnTheRight = 29
+    EmbankmentOnTheLeft = 30
+    LightSignals = 31
+    Yield = 32
+    Stop = 33
+    PriorityRoad = 34
+    Intersection = 35
+    CrossingWithPriorityOverMinorRoad = 36
+    CrossingWithPriorityToTheRight = 37
+    BranchToTheRight = 38
+    BranchToTheLeft = 39
+    CarriagewayNarrows = 40
+    CarriagewayNarrowsRight = 41
+    CarriagewayNarrowsLeft = 42
+    LaneMergeFromRight = 43
+    LaneMergeFromLeft = 44
+    LaneMergeCenter = 45
+    NoOvertaking = 46
+    NoOvertakingEnd = 47
+    ProtectedPassingEnd = 48
+    ProtectedPassing = 49
+    Pedestrians = 50
+    PedestrianCrossing = 51
+    Children = 52
+    SchoolZone = 53
+    Cyclists = 54
+    TwoWayTraffic = 55
+    RailroadCrossingWithGates = 56
+    RailroadCrossingWithoutGates = 57
+    RailroadCrossing = 58
+    TramwayCrossing = 59
+    FallingRocks = 60
+    FallingRocksOnTheLeft = 61
+    FallingRocksOnTheRight = 62
+    SteepDropOnLeft = 63
+    SteepDropOnRight = 64
+    SlipperyRoad = 66
+    SteepIncline = 67
+    SteepDecline = 68
+    UnevenRoad = 69
+    Bump = 70
+    Dip = 71
+    RoadFloods = 72
+    IcyRoad = 73
+    Wind = 74
+    TrafficCongestion = 75
+    HighAccidentArea = 76
+    CityEntry = 77
+    AudibleWarning = 78
+    EndOfAllRestrictions = 79
+    PriorityOverOncoming = 81
+    YieldToOncoming = 82
+    CityExit = 83
+    VillageAhead = 84
+    SpeedCamera = 85
+    TrafficEnforcementCamera = 86
+    SpeedLimit = 87
+    SpeedLimitEnd = 88
+    MovableBridge = 89
+    SlowDown = 90
+    IntersectionTRight = 91
+    IntersectionTLeft = 92
+    IntersectionTLeftRight = 93
+    IntersectionY = 94
+    PriorityRoadEnd = 95
+    UseLowGear = 96
+    NoCompressionBraking = 97
+    WaitingLine = 98
+    DontStopZone = 99
+    LaneUsedInBothDirections = 100
+    HonkingProhibited = 101
+    FastenSeatBelt = 102
+    DeadEnd = 103
+    AdvisorySpeedLimit = 104
+    SpeedLimitNight = 105
+    MinimumSpeed = 106
+    VariableSpeedLimit = 107
+    Variable = 108
+    GoodLuck = 254
+    Unknown = 255
+}
+
+enumeration LandmarkObjectPoleType {
+    GuardrailPost
+    LightPole
+    DelineatorPost
+    ReflectorPost
+    GantryPole
+    SignPost
+    Other
+    Unclassified
+}
+
+struct LandmarkObjectDetails polymorphic {
+}
+
+struct LandmarkObjectSignDetails extends LandmarkObjectDetails {
+    LandmarkObjectSignShape signShape   // Shape of the face of the sign
+    WarningSign signMeaning             // Meaning of the (warning) sign
+    UInt16 diameter                     // Diameter of the round sign in cm (0 = has no diameter)
+    WGS84Point [] boundingBox            // BoundingBox around the sign (vector of relative WGS84 positions)
+}
+
+struct LandmarkObjectPoleDetails extends LandmarkObjectDetails {
+    WGS84Point polePositionGround       // The point where the pole intersects with the ground it is standing upon (relative WGS84 position)
+    UInt16 diameter                     // Diameter of the pole at ground in cm
+    UInt16 height                       // Height of the pole in cm
+    LandmarkObjectPoleType poleType     // Type of pole
+}
+
+struct LandmarkObjectPerpendicularWallDetails extends LandmarkObjectDetails {
+    WGS84Point [] boundingBox            // Bounding box around the wall (vector of relative WGS84 positions)
+}
+
+struct LandmarkObject {
+    LandmarkObjectType objectType       // Sign, Pole, Marking, TrafficLight, PerpendicularWall
+    Boolean hasCovariance
+    Covariance covariance               // Covariance for this object
+    LandmarkObjectDetails details       // Landmark object details
+}
+
+struct LandmarkProfileValue extends ProfileValue {
+    WGS84Point position                 // Absolute WGS84 position of the landmark
+//      UInt8 confidenceLevel               // Confidence level of the landmark data. Value in the range from 0 to 100.
+                                        // Confidence is already available as float value in Profile
+    LandmarkObject [] objects            // Vector of landmark objects
+}
+
+// Z.5 BackChannel (separate MapECU_IF -> maybe own fidl in the future):
+enumeration BackChannelAction {
+    None = 0
+    ResendHorizon = 1   // Resend whole horizon due to e.g. message loss
+	
+	// Change MostProbablePath to a dedicated path (via pathId).
+	// The meaning of pathId=0 is to switch to the path of the second most probable position,
+	// anyhow it is preferred to get a dedicated path to retain the context
+    ChangeMPP = 2
+}
+
+struct BackChannelMessage {
+    UInt16 majorVersion         // Major MapECU interface version. Incompatible change
+	
+	// Minor MapECU interface version. Compatible change: e.g. small bugfixes, new field
+	// at the end of a struct, new enum value, etc.
+    UInt16 minorVersion
+    BackChannelAction action
+    PathId pathId               // Only needed for BackChannelAction = ChangeMPP
+}
+}

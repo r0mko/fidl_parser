@@ -3,14 +3,31 @@
 
 #include "ast/ast.h"
 #include "parser/parser.h"
-#include "constants.h"
 
 using namespace std;
 
-int main()
+int main(int argc, const char *argv[])
 {
+
     namespace x3 = boost::spirit::x3;
     using namespace std;
+
+    cout << "Argument count " << argc << endl;
+    for (int i = 0; i < argc; ++i) {
+        cout << argv[i] << endl;
+    }
+
+    if (argc < 2) {
+        cerr << "No input file provided!" << endl <<  "Usage: spirit_parser [fidl_file]" << endl;
+        exit(1);
+    }
+
+    bool ok;
+    string input = FrancaParser::readFile(argv[1], ok);
+    if (!ok) {
+        cerr << "Can't open input file " << argv[1] << endl << "Exiting" << endl;
+        exit(1);
+    }
 
     auto first = input.begin();
     auto last = input.end();
