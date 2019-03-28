@@ -33,7 +33,14 @@ int main(int argc, const char *argv[])
     auto last = input.end();
     
     fdepl::fdepl_full_t output1;
-    x3::phrase_parse(first, last, fdepl::fdepl_full, fdepl::whitespace, output1);
+    try
+    {
+       x3::phrase_parse(first, last, fdepl::fdepl_full, fdepl::whitespace, output1);
+    } catch (const std::exception& e)
+    {
+       std::cerr<<e.what()<<std::endl;
+    }
+    
     return 0;
 
     ast::FModel output;
