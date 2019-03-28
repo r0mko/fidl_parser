@@ -37,8 +37,11 @@ using fmember_t = pair<identifier_t, propertyset_t>;
 x3::rule<class fmember_id, fmember_t> const fmember { "fmember" };
 
 using fenum_t = pair<identifier_t, vector<fmember_t>>;
-using fstruct_t = pair<identifier_t, vector<fmember_t>>;
 x3::rule<class fenum_id, fenum_t> const fenum { "fenum" };
+
+using fstruct_mem_t = x3::variant<propertyset_t, fmember_t>;
+x3::rule<class fstruct_mem_id, fstruct_mem_t> const fstruct_mem { "fstruct_mem" };
+using fstruct_t = pair<identifier_t, vector<fstruct_mem_t>>;
 x3::rule<class fstruct_id, fstruct_t> const fstruct { "fstruct" };
 
 using fqn_t = vector<identifier_t>;
@@ -75,8 +78,9 @@ auto const propvalue_def = bool_ | int_ | double_ | identifier;
 auto const property_def = identifier >> lit("=") >> propvalue;
 auto const propertyset_def = +(-lit(",") >> property);
 auto const fmember_def = identifier >> lit("{") >> propertyset >> lit("}");
-auto const fenum_def = lit("enumeration") >> identifier >> "{" >> *(fmember) >> "}";
-auto const fstruct_def = lit("struct") >> identifier >> "{" >> *(fmember) >> "}";
+auto const fenum_def = lit("enumeration") >> identifier >> '{' >> *(fmember) >> '}';
+auto const fstruct_mem_def = propertyset | fmember;
+auto const fstruct_def = lit("struct") >> identifier >> '{' >> *(fstruct_mem) >> '}';
 auto const fqn_def = identifier % ".";
 auto const import_def = lit("import") >> lexeme['"' >> identifier >> lit(".fidl") >> '"'];
 auto const data_def = propertyset | fenum | fstruct;
@@ -92,6 +96,7 @@ BOOST_SPIRIT_DEFINE(
    propertyset,
    fmember,
    fenum,
+   fstruct_mem,
    fstruct,
    fqn,
    import,
