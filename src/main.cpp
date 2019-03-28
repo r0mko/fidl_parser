@@ -32,7 +32,7 @@ int main(int argc, const char *argv[])
     auto first = input.begin();
     auto last = input.end();
     
-    fdepl::fdepl_define_type output1;
+    fdepl::fdepl_define_t output1;
     x3::phrase_parse(first, last, fdepl::fdepl_define, fdepl::whitespace, output1);
     return 0;
 

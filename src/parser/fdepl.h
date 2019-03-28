@@ -22,30 +22,30 @@ using x3::lexeme;
 using x3::_val;
 using x3::_attr;
 
-using identifier_type = string;
-x3::rule<class identifier_id, identifier_type> const identifier { "identifier" };
+using identifier_t = string;
+x3::rule<class identifier_id, identifier_t> const identifier { "identifier" };
 
-using propvalue_type = x3::variant<bool, int64_t, double, identifier_type>;
-x3::rule<class propvalue_id, propvalue_type> const propvalue { "propvalue" };
-using property_type = pair<identifier_type, propvalue_type>;
-x3::rule<class property_id, property_type> const property { "property" };
-using propertyset_type = vector<property_type>;
-x3::rule<class propertyset_id, propertyset_type> const propertyset { "propertyset" };
+using propvalue_t = x3::variant<bool, int64_t, double, identifier_t>;
+x3::rule<class propvalue_id, propvalue_t> const propvalue { "propvalue" };
+using property_t = pair<identifier_t, propvalue_t>;
+x3::rule<class property_id, property_t> const property { "property" };
+using propertyset_t = vector<property_t>;
+x3::rule<class propertyset_id, propertyset_t> const propertyset { "propertyset" };
 
-using fmember_type = pair<identifier_type, propertyset_type>;
-x3::rule<class fmember_id, fmember_type> const fmember { "fmember" };
+using fmember_t = pair<identifier_t, propertyset_t>;
+x3::rule<class fmember_id, fmember_t> const fmember { "fmember" };
 
-using fstrenum_type = pair<identifier_type, vector<fmember_type>>;
-x3::rule<class fenum_id, fstrenum_type> const fenum { "fenum" };
-x3::rule<class fstruct_id, fstrenum_type> const fstruct { "fstruct" };
+using fstrenum_t = pair<identifier_t, vector<fmember_t>>;
+x3::rule<class fenum_id, fstrenum_t> const fenum { "fenum" };
+x3::rule<class fstruct_id, fstrenum_t> const fstruct { "fstruct" };
 
-using fqn_type = vector<identifier_type>;
-x3::rule<class fqn_id, fqn_type> const fqn { "fqn" };
+using fqn_t = vector<identifier_t>;
+x3::rule<class fqn_id, fqn_t> const fqn { "fqn" };
 
-x3::rule<class import_id, identifier_type> const import { "import" };
-using data_type = x3::variant<propertyset_type, fstrenum_type>;
-using fdepl_define_type = tuple<fqn_type, fqn_type, vector<data_type>>;
-x3::rule<class fdepl_define_id, fdepl_define_type> const fdepl_define { "fdepl_define" };
+x3::rule<class import_id, identifier_t> const import { "import" };
+using data_t = x3::variant<propertyset_t, fstrenum_t>;
+using fdepl_define_t = tuple<fqn_t, fqn_t, vector<data_t>>;
+x3::rule<class fdepl_define_id, fdepl_define_t> const fdepl_define { "fdepl_define" };
 
 auto const whitespace
    = x3::blank
