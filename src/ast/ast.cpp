@@ -1,20 +1,22 @@
 #include "ast.h"
 #include <boost/algorithm/string/join.hpp>
 
-bool ast::FTypeCollection::hasType(const std::string &name) const {
-    auto it = std::find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
+using namespace std;
+
+bool ast::FTypeCollection::hasType(const string &name) const {
+    auto it = find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
     return it != types.cend();
 }
 
-ast::DefinitionType ast::FTypeCollection::getTypeByName(const std::string &name) const {
-    auto it = std::find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
+ast::DefinitionType ast::FTypeCollection::getTypeByName(const string &name) const {
+    auto it = find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
     if (it == types.cend()) {
         return Invalid;
     }
     return (*it).getType();
 }
 
-std::ostream &ast::operator <<(std::ostream &out, ast::FType t)
+ostream &ast::operator <<(ostream &out, ast::FType t)
 {
     out << boost::apply_visitor(FType::to_string(), t);
     if (t.hasAnnotations()) {
@@ -26,7 +28,7 @@ std::ostream &ast::operator <<(std::ostream &out, ast::FType t)
     return out;
 }
 
-std::string ast::FType::to_string::operator()(ast::FStruct f) const {
+string ast::FType::to_string::operator()(ast::FStruct f) const {
     ostringstream out;
     out << "struct " << f.name;
     if (f.polymorphic) {
@@ -49,7 +51,7 @@ std::string ast::FType::to_string::operator()(ast::FStruct f) const {
     return out.str();
 }
 
-std::string ast::FType::to_string::operator()(ast::FEnum e) const {
+string ast::FType::to_string::operator()(ast::FEnum e) const {
     ostringstream out;
     out << "enum " << e.name << endl;
     for (FEnum_Member mem : e.members) {
@@ -62,7 +64,7 @@ std::string ast::FType::to_string::operator()(ast::FEnum e) const {
     return out.str();
 }
 
-std::string ast::FType::to_string::operator()(ast::FTypeDef t) const {
+string ast::FType::to_string::operator()(ast::FTypeDef t) const {
     ostringstream out;
     out << "typedef " << t.name << " -> " << t.type;
     return out.str();
@@ -73,7 +75,7 @@ ast::DefinitionType ast::FType::getType() const
     return boost::apply_visitor(get_type(), *this);
 }
 
-std::string ast::FType::getName() const
+string ast::FType::getName() const
 {
     return boost::apply_visitor(get_name(), *this);
 }
@@ -88,9 +90,37 @@ ast::FAnnotationBlock ast::FType::getAnnotations() const
     return boost::apply_visitor(get_annotation(), *this).get();
 }
 
-std::string ast::FModel::getPackageName() const
+pair<ast::FModel::TCIterator, ast::FModel::FTypeIterator> ast::FModel::findTypeByName(const string &name) const
+{
+    auto i_tc = typeCollections.cbegin();
+    while (i_tc != typeCollections.cend()) {
+        const FTypeCollection &tc = *i_tc;
+        auto i_t = find_if(tc.types.cbegin(), tc.types.cend(), [&](const FType &t) { return t.getName() == name; });
+        if (i_t != tc.types.cend()) {
+            return { i_tc, i_t };
+        }
+        ++i_tc;
+    }
+    return { i_tc, typeCollections.back().types.cend() };
+}
+
+boost::optional<ast::FType> ast::FModel::getTypeByName(const string &name) const
+{
+    auto ipair = findTypeByName(name);
+    if (ipair.first != typeCollections.cend()) {
+        return  *(ipair.second);
+    }
+    return boost::none;
+}
+
+string ast::FModel::getPackageName() const
 {
    return packageName.toString();
+}
+
+string ast::FQN::toString() const
+{
+    return boost::algorithm::join(*this, ".");
 }
 
 

@@ -12,10 +12,7 @@ using namespace std;
 
 struct FQN : public vector<string>
 {
-    string toString() const
-    {
-       return boost::algorithm::join(*this, ".");
-    }
+    string toString() const;
 };
 
 }

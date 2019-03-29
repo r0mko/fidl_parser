@@ -120,6 +120,10 @@ struct FModel
    ast::FQN packageName;
     // TODO: imports
    vector<FTypeCollection> typeCollections;
+   using TCIterator = decltype (typeCollections)::const_iterator;
+   using FTypeIterator = decltype (FTypeCollection::types)::const_iterator;
+   pair<TCIterator, FTypeIterator> findTypeByName(const string &name) const;
+   optional<FType> getTypeByName(const string &name) const;
    std::string getPackageName() const;
 };
 
