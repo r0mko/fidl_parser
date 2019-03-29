@@ -18,9 +18,13 @@ void introspect(T &ctx) {
 
 namespace x3 = boost::spirit::x3;
 
-x3::rule<class identifier_id, std::string> const identifier { "identifier" };
-x3::rule<class fqn_id, ast::FQN> const fqn { "fqn" };
-
+using x3::int_;
+using x3::lit;
+using x3::double_;
+using x3::lexeme;
+using x3::_val;
+using x3::bool_;
+using x3::_attr;
 
 static struct known_type_parser : x3::symbols<std::string>
 {
@@ -36,13 +40,22 @@ auto const add_type = [](auto &ctx)
     _val(ctx).push_back(_attr(ctx));
 };
 
-auto const identifier_def = x3::raw[x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
-auto const fqn_def = x3::lexeme[identifier % "."];
+auto const identifier
+   = x3::rule<class identifier_id, std::string> { "identifier" }
+   = x3::raw[x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
+
+auto const fqn
+   = x3::rule<class fqn_id, ast::FQN> { "fqn" }
+   = x3::lexeme[identifier % "."];
+   
+auto const package
+   = x3::rule<class package_id, ast::FQN> { "package" }
+   = lit("package") >> fqn;
+
 auto const whitespace
    = x3::blank
    | x3::lexeme[ "//" >> *(x3::char_ - x3::eol) >> x3::eol ]
    | x3::eol;
 
-BOOST_SPIRIT_DEFINE(identifier, fqn)
 }
 #endif // COMMON_H

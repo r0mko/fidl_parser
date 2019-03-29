@@ -90,7 +90,7 @@ ast::FAnnotationBlock ast::FType::getAnnotations() const
 
 std::string ast::FModel::getPackageName() const
 {
-    return boost::algorithm::join(packageName, ".");
+   return packageName.toString();
 }
 
 
