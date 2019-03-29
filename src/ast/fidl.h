@@ -76,8 +76,13 @@ private:
     };
 
 public:
+    FType() = default;
+    FType(const FType&) = default;
+    FType& operator= (const FType&) = default;
+
     using base_type::base_type;
     using base_type::operator =;
+
     DefinitionType getType() const;
     string getName() const;
 

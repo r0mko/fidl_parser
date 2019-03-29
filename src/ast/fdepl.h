@@ -58,6 +58,7 @@ struct FDStruct : FDTypebase
 //using FDTypeDefinition = x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>;
 struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
 {
+private:
    struct get_type : public boost::static_visitor<ast::DefinitionType>
    {
       ast::DefinitionType operator()(ast::FDStruct) const { return ast::DefinitionType::Struct; }
@@ -72,15 +73,19 @@ struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FD
        string operator()(const FDTypedef &f) const { return f.name; }
    };
 
+public:
+   FDTypeDefinition() = default;
+   FDTypeDefinition(const FDTypeDefinition&) = default;
+   FDTypeDefinition& operator= (const FDTypeDefinition&) = default;
+
+   using base_type::base_type;
+   using base_type::operator=;
 
    string getName() const;
    ast::DefinitionType getType() const;
    bool isStruct() const;
    bool isEnum() const;
    bool isTypedef() const;
-
-   using base_type::base_type;
-   using base_type::operator=;
 };
 
 struct FDTypes
