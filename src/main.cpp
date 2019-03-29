@@ -19,7 +19,7 @@ int main(int argc, const char *argv[])
     }
 
     ast::FModel output;
-    bool ok =FrancaParser::parse(argv[1], output);
+    bool ok = FrancaParser::parse(argv[1], output);
 
     int i = 0;
     if (true == ok)
@@ -47,6 +47,7 @@ int main(int argc, const char *argv[])
     }
     cout << endl << "Known types: ";
     franca::known_type.for_each([](string s, string ) { std::cout << s << " "; });
+    std::cout<<std::endl;
 
     return 0;
 }

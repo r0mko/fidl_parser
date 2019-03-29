@@ -45,7 +45,7 @@ bool FrancaParser::parse(const std::string& filename, ast::FModel& fmodel_ast)
          break;
       }
       
-      result = fdmodel_ast.imports.empty();
+      result = (false == fdmodel_ast.imports.empty());
       if (false == result)
       {
          std::cerr<<"No imports in FDepl "<<fdepl_path.string()<<std::endl;
