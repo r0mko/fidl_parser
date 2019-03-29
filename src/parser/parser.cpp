@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include "ast/common.h"
 
 namespace x3 = boost::spirit::x3;
 
@@ -60,7 +61,7 @@ bool FrancaParser::parse(const std::string& filename, ast::FModel& fmodel_ast)
          break;
       }
       
-      //result = mergeFdeplAndFidl();
+      result = mergeFdeplAndFidl(fdmodel_ast, fmodel_ast);
       if (false == result)
       {
          std::cerr<<"Error merging FDepl "<<fdepl_path.string()<< " and Fidl " << fidl_path.string() <<std::endl;
@@ -96,6 +97,24 @@ bool FrancaParser::parseFidl(const std::string& filename, ast::FModel& fmodel_as
       result = x3::phrase_parse(fidl.begin(), fidl.end(), franca::fmodel, franca::whitespace, fmodel_ast);
    }
    
+   return result;
+}
+
+bool FrancaParser::mergeFdeplAndFidl(const ast::FDModel& fdmodel_ast, ast::FModel& fmodel_ast)
+{
+   bool result = true;
+   
+   for (const auto& deployment : fdmodel_ast.deployments)
+   {
+      for (const auto& fdtype : deployment.types)
+      {
+//         auto type = fdtype.apply_visitor(ast::FDTypeDefinition::get_type());
+//         if (ast::DefinitionType::Struct == type)
+//         {
+            
+//         }
+      }
+   }
    return result;
 }
 

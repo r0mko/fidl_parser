@@ -18,13 +18,6 @@ using namespace std;
 namespace x3 = boost::spirit::x3;
 using boost::optional;
 
-enum DefinitionType {
-    Struct,
-    TypeDef,
-    Enum,
-    Invalid
-};
-
 struct FStructMember
 {
     string type;
@@ -45,6 +38,7 @@ struct FStruct : FTypeBase
 {
     optional<string> polymorphic;
     vector<FStructMember> members;
+    int tag;
 };
 
 struct FTypeDef : FTypeBase
@@ -64,9 +58,9 @@ struct FType : x3::variant<FStruct, FTypeDef, FEnum>
 private:
     struct get_type : public boost::static_visitor<DefinitionType>
     {
-        DefinitionType operator()(FStruct) const { return Struct; }
-        DefinitionType operator()(FTypeDef) const { return TypeDef; }
-        DefinitionType operator()(FEnum) const { return Enum; }
+        DefinitionType operator()(FStruct) const { return DefinitionType::Struct; }
+        DefinitionType operator()(FTypeDef) const { return DefinitionType::TypeDef; }
+        DefinitionType operator()(FEnum) const { return DefinitionType::Enum; }
     };
 
     struct get_name : public boost::static_visitor<string>

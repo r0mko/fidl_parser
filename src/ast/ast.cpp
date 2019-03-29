@@ -11,7 +11,7 @@ bool ast::FTypeCollection::hasType(const string &name) const {
 ast::DefinitionType ast::FTypeCollection::getTypeByName(const string &name) const {
     auto it = find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
     if (it == types.cend()) {
-        return Invalid;
+        return DefinitionType::Invalid;
     }
     return (*it).getType();
 }

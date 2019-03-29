@@ -52,12 +52,19 @@ struct FDStruct : FDTypebase
     vector<FDField> fields;
 };
 
-using FDTypeDefinition = x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>;
-//struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
-//{
-//    using base_type::base_type;
-//    using base_type::operator=;
-//};
+//using FDTypeDefinition = x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>;
+struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
+{
+   struct get_type : public boost::static_visitor<FDTypeDefinition>
+   {
+      ast::DefinitionType operator()(ast::FDStruct) const { return ast::DefinitionType::Struct; }
+      ast::DefinitionType operator()(ast::FDTypedef) const { return ast::DefinitionType::TypeDef; }
+      ast::DefinitionType operator()(ast::FDEnumeration) const { return ast::DefinitionType::Enum; }
+   };
+   
+   using base_type::base_type;
+   using base_type::operator=;
+};
 
 struct FDTypes
 {
