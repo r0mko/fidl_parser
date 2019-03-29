@@ -10,19 +10,14 @@ namespace ast {
 
 using namespace std;
 
-struct FQN
+struct FQN : public vector<string>
 {
-    vector<string> path;
     string toString() const
     {
-       return boost::algorithm::join(path, ".");
+       return boost::algorithm::join(*this, ".");
     }
 };
 
 }
-
-BOOST_FUSION_ADAPT_STRUCT(
-   ast::FQN,
-   path);
 
 #endif // COMMON_H
