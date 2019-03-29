@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <boost/algorithm/string/join.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
 
 namespace ast {
 

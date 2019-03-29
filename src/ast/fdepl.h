@@ -10,6 +10,9 @@
 namespace ast {
 using namespace std;
 namespace x3 = boost::spirit::x3;
+using boost::optional;
+
+
 
 using FDValue = x3::variant<bool, int, double, string>;
 //struct FDValue : x3::variant<bool, int, double, string>
@@ -55,13 +58,27 @@ struct FDStruct : FDTypebase
 //using FDTypeDefinition = x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>;
 struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
 {
-   struct get_type : public boost::static_visitor<FDTypeDefinition>
+   struct get_type : public boost::static_visitor<ast::DefinitionType>
    {
       ast::DefinitionType operator()(ast::FDStruct) const { return ast::DefinitionType::Struct; }
       ast::DefinitionType operator()(ast::FDTypedef) const { return ast::DefinitionType::TypeDef; }
       ast::DefinitionType operator()(ast::FDEnumeration) const { return ast::DefinitionType::Enum; }
    };
    
+   struct get_name : public boost::static_visitor<string>
+   {
+       string operator()(const FDEnumeration &f) const { return f.name; }
+       string operator()(const FDStruct &f) const { return f.name; }
+       string operator()(const FDTypedef &f) const { return f.name; }
+   };
+
+
+   string getName() const;
+   ast::DefinitionType getType() const;
+   bool isStruct() const;
+   bool isEnum() const;
+   bool isTypedef() const;
+
    using base_type::base_type;
    using base_type::operator=;
 };
@@ -78,8 +95,10 @@ struct FDModel
 {
     FQN packageName;
     vector<string> imports;
-    vector<FDTypes> deployments;
+    vector<FDTypes> deployments;    
 };
+
+
 
 } // namespace ast
 

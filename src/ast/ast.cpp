@@ -2,6 +2,7 @@
 #include <boost/algorithm/string/join.hpp>
 
 using namespace std;
+using boost::optional;
 
 bool ast::FTypeCollection::hasType(const string &name) const {
     auto it = find_if(types.cbegin(), types.cend(), [&](const FType &t) { return t.getName() == name; });
@@ -104,7 +105,7 @@ pair<ast::FModel::TCIterator, ast::FModel::FTypeIterator> ast::FModel::findTypeB
     return { i_tc, typeCollections.back().types.cend() };
 }
 
-boost::optional<ast::FType> ast::FModel::getTypeByName(const string &name) const
+optional<ast::FType> ast::FModel::getTypeByName(const string &name) const
 {
     auto ipair = findTypeByName(name);
     if (ipair.first != typeCollections.cend()) {
@@ -122,5 +123,31 @@ string ast::FQN::toString() const
 {
     return boost::algorithm::join(*this, ".");
 }
+
+string ast::FDTypeDefinition::getName() const
+{
+    return boost::apply_visitor(get_name(), *this);
+}
+
+ast::DefinitionType ast::FDTypeDefinition::getType() const
+{
+    return boost::apply_visitor(get_type(), *this);
+}
+
+bool ast::FDTypeDefinition::isStruct() const
+{
+    return getType() == ast::DefinitionType::Struct;
+}
+
+bool ast::FDTypeDefinition::isEnum() const
+{
+    return getType() == ast::DefinitionType::Enum;
+}
+
+bool ast::FDTypeDefinition::isTypedef() const
+{
+    return getType() == ast::DefinitionType::TypeDef;
+}
+
 
 
