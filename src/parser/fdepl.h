@@ -2,6 +2,9 @@
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/io.hpp>
+#include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <string>
 #include <iostream>
 
@@ -23,44 +26,21 @@ using x3::lexeme;
 using x3::_val;
 using x3::_attr;
 
-using identifier_t = string;
-x3::rule<class identifier_id, identifier_t> const identifier { "identifier" };
-
-using propvalue_t = x3::variant<bool, int, double, identifier_t>;
-x3::rule<class propvalue_id, propvalue_t> const propvalue { "propvalue" };
-using property_t = pair<identifier_t, propvalue_t>;
-x3::rule<class property_id, property_t> const property { "property" };
-using propertyset_t = vector<property_t>;
-x3::rule<class propertyset_id, propertyset_t> const propertyset { "propertyset" };
-
-using fmember_t = pair<identifier_t, propertyset_t>;
-x3::rule<class fmember_id, fmember_t> const fmember { "fmember" };
-
-using fenum_t = pair<identifier_t, vector<fmember_t>>;
-x3::rule<class fenum_id, fenum_t> const fenum { "fenum" };
-
-using fstruct_mem_t = x3::variant<propertyset_t, fmember_t>;
-x3::rule<class fstruct_mem_id, fstruct_mem_t> const fstruct_mem { "fstruct_mem" };
-using fstruct_t = pair<identifier_t, vector<fstruct_mem_t>>;
-x3::rule<class fstruct_id, fstruct_t> const fstruct { "fstruct" };
-
-using fqn_t = vector<identifier_t>;
-x3::rule<class fqn_id, fqn_t> const fqn { "fqn" };
-
-x3::rule<class import_id, identifier_t> const import { "import" };
-
-using data_t = x3::variant<propertyset_t, fenum_t, fstruct_t>;
-x3::rule<class data_id, data_t> const data { "data" };
-using dataset_t = vector<data_t>;
-x3::rule<class dataset_id, dataset_t> const dataset { "dataset" };
-
-using fdepl_define_header_t = pair<fqn_t, fqn_t>;
-x3::rule<class fdepl_define_header_id, fdepl_define_header_t> const fdepl_define_header { "fdepl_define_header" };
-using fdepl_define_t = pair<fdepl_define_header_t, boost::optional<dataset_t>>;
-x3::rule<class fdepl_define_id, fdepl_define_t> const fdepl_define { "fdepl_define" };
-
-using fdepl_full_t = pair<identifier_t, boost::optional<fdepl_define_t>>;
-x3::rule<class fdepl_full_id, fdepl_full_t> const fdepl_full { "fdepl_full" };
+x3::rule<class identifier_id, ast::fdepl::identifier_t> const identifier { "identifier" };
+x3::rule<class propvalue_id, ast::fdepl::propvalue_t> const propvalue { "propvalue" };
+x3::rule<class property_id, ast::fdepl::property_t> const property { "property" };
+x3::rule<class propertyset_id, ast::fdepl::propertyset_t> const propertyset { "propertyset" };
+x3::rule<class fmember_id, ast::fdepl::fmember_t> const fmember { "fmember" };
+x3::rule<class fenum_id, ast::fdepl::fenum_t> const fenum { "fenum" };
+x3::rule<class fstruct_mem_id, ast::fdepl::fstruct_mem_t> const fstruct_mem { "fstruct_mem" };
+x3::rule<class fstruct_id, ast::fdepl::fstruct_t> const fstruct { "fstruct" };
+x3::rule<class fqn_id, ast::fdepl::fqn_t> const fqn { "fqn" };
+x3::rule<class import_id, ast::fdepl::identifier_t> const import { "import" };
+x3::rule<class data_id, ast::fdepl::data_t> const data { "data" };
+x3::rule<class dataset_id, ast::fdepl::dataset_t> const dataset { "dataset" };
+x3::rule<class fdepl_define_header_id, ast::fdepl::fdepl_define_header_t> const fdepl_define_header { "fdepl_define_header" };
+x3::rule<class fdepl_define_id, ast::fdepl::fdepl_define_t> const fdepl_define { "fdepl_define" };
+x3::rule<class fdepl_full_id, ast::fdepl::fdepl_full_t> const fdepl_full { "fdepl_full" };
 
 auto const whitespace
    = x3::blank
@@ -105,5 +85,27 @@ BOOST_SPIRIT_DEFINE(
    fdepl_define_header,
    fdepl_define,
    fdepl_full);
+
+struct error_handler
+{
+   template <typename Iterator, typename Exception, typename Context>
+   x3::error_handler_result on_error(
+      Iterator& first, Iterator const& last
+      , Exception const& x, Context const& context)
+   {
+      auto& error_handler = x3::get<x3::error_handler_tag>(context).get();
+      std::string message = "Error! Expecting: " + x.which() + " here:";
+      error_handler(x.where(), message);
+      return x3::error_handler_result::fail;
+   }
+};
+
+class property_id : error_handler, x3::annotate_on_success {};
+class fmember_id : error_handler, x3::annotate_on_success {};
+class fenum_id : error_handler, x3::annotate_on_success {};
+class fstruct_id : error_handler, x3::annotate_on_success {};
+class fdepl_define_id : error_handler, x3::annotate_on_success {};
+class fdepl_full_id : error_handler, x3::annotate_on_success {};
+
 
 }
