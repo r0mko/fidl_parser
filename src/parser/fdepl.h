@@ -37,7 +37,6 @@ x3::rule<class fstruct_id, ast::fdepl::fstruct_t> const fstruct { "fstruct" };
 x3::rule<class fqn_id, ast::fdepl::fqn_t> const fqn { "fqn" };
 x3::rule<class import_id, ast::fdepl::identifier_t> const import { "import" };
 x3::rule<class data_id, ast::fdepl::data_t> const data { "data" };
-x3::rule<class dataset_id, ast::fdepl::dataset_t> const dataset { "dataset" };
 x3::rule<class fdepl_define_header_id, ast::fdepl::fdepl_define_header_t> const fdepl_define_header { "fdepl_define_header" };
 x3::rule<class fdepl_define_id, ast::fdepl::fdepl_define_t> const fdepl_define { "fdepl_define" };
 x3::rule<class fdepl_full_id, ast::fdepl::fdepl_full_t> const fdepl_full { "fdepl_full" };
@@ -64,10 +63,9 @@ auto const fstruct_def = lit("struct") >> identifier >> '{' >> *(fstruct_mem) >>
 auto const fqn_def = identifier % ".";
 auto const import_def = lit("import") >> lexeme['"' >> identifier >> lit(".fidl") >> '"'];
 auto const data_def = propertyset | fenum | fstruct;
-auto const dataset_def = +(data);
 auto const fdepl_define_header_def = lit("define") >> fqn >> lit("for") >> lit("typeCollection") >> fqn;
-auto const fdepl_define_def =  fdepl_define_header > lit("{") > -dataset > lit("}");
-auto const fdepl_full_def = import >> -fdepl_define;
+auto const fdepl_define_def = fdepl_define_header > lit("{") > *(data) > lit("}");
+auto const fdepl_full_def = +(import) >> +(fdepl_define);
 
 BOOST_SPIRIT_DEFINE(
    identifier,
@@ -81,7 +79,6 @@ BOOST_SPIRIT_DEFINE(
    fqn,
    import,
    data,
-   dataset,
    fdepl_define_header,
    fdepl_define,
    fdepl_full);
