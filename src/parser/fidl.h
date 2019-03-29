@@ -59,7 +59,7 @@ auto const annotation_text = x3::rule<class annotation_text_id, std::string>{} =
 auto const fannotation_def = lit("@") >> identifier >> ":" >> annotation_text;
 auto const fannotation_block_def = lit("<**") >> *fannotation >> "**>";
 
-auto const fmodel_def = lit("package") >> x3::lexeme[identifier % "."] >> *ftypecollection;
+auto const fmodel_def = package >> *ftypecollection;
 
 // FIXME: remove
 using property_t = pair<string, int>;

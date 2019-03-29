@@ -11,6 +11,8 @@
 #include <boost/optional/optional.hpp>
 #include <boost/algorithm/string/join.hpp>
 
+#include "ast/common.h"
+
 namespace ast {
 using namespace std;
 namespace x3 = boost::spirit::x3;
@@ -115,10 +117,10 @@ struct FTypeCollection
 
 struct FModel
 {
-    vector<string> packageName;
+   ast::FQN packageName;
     // TODO: imports
-    vector<FTypeCollection> typeCollections;
-    std::string getPackageName() const;
+   vector<FTypeCollection> typeCollections;
+   std::string getPackageName() const;
 };
 
 }
