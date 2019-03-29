@@ -11,11 +11,12 @@ namespace ast {
 using namespace std;
 namespace x3 = boost::spirit::x3;
 
-struct FDValue : x3::variant<bool, int, double, string>
-{
-    using base_type::base_type;
-    using base_type::operator=;
-};
+using FDValue = x3::variant<bool, int, double, string>;
+//struct FDValue : x3::variant<bool, int, double, string>
+//{
+//    using base_type::base_type;
+//    using base_type::operator=;
+//};
 
 struct FDProperty
 {
@@ -51,11 +52,12 @@ struct FDStruct : FDTypebase
     vector<FDField> fields;
 };
 
-struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
-{
-    using base_type::base_type;
-    using base_type::operator=;
-};
+using FDTypeDefinition = x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>;
+//struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
+//{
+//    using base_type::base_type;
+//    using base_type::operator=;
+//};
 
 struct FDTypes
 {
