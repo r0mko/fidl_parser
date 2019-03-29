@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-fidl::known_type_parser::known_type_parser() {
+franca::known_type_parser::known_type_parser() {
     add("Float", "Float");
     add("Double", "Double");
     add("UInt64", "UInt64");

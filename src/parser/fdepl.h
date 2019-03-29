@@ -6,9 +6,10 @@
 #include <iostream>
 
 #include "ast/ast.h"
+#include "common.h"
 #include "utils.h"
 
-namespace fdepl {
+namespace franca {
 
 namespace x3 = boost::spirit::x3;
 namespace ascii = boost::spirit::x3::ascii;
@@ -23,87 +24,37 @@ using x3::lexeme;
 using x3::_val;
 using x3::_attr;
 
-using identifier_t = string;
-x3::rule<class identifier_id, identifier_t> const identifier { "identifier" };
+x3::rule<class property_id, ast::FDProperty> const fdproperty { "property" };
+x3::rule<class propertyset_id, ast::FDPropertySet> const fdpropertyset { "propertyset" };
+x3::rule<class fdenum_id, ast::FDEnumeration> const fdenum { "fdenum" };
+x3::rule<class fdstruct_id, ast::FDStruct> const fdstruct { "fdstruct" };
+x3::rule<class fdtypedef_id, ast::FDTypedef> const fdtypedef { "fdtypedef" };
+x3::rule<class import_id, string> const import { "import" };
+x3::rule<class fdtypes_id, ast::FDTypes> const fdtypes { "fdtypes" };
+x3::rule<class fdmodel_id, ast::FDModel> const fdmodel { "fdmodel" };
 
-using propvalue_t = x3::variant<bool, int, double, identifier_t>;
-x3::rule<class propvalue_id, propvalue_t> const propvalue { "propvalue" };
-using property_t = pair<identifier_t, propvalue_t>;
-x3::rule<class property_id, property_t> const property { "property" };
-using propertyset_t = vector<property_t>;
-x3::rule<class propertyset_id, propertyset_t> const propertyset { "propertyset" };
+auto const fdvalue
+    = x3::rule<class fdvalue_id, ast::FDValue> { "propvalue" }
+    = bool_ | int_ | double_ | identifier;
 
-using fmember_t = pair<identifier_t, propertyset_t>;
-x3::rule<class fmember_id, fmember_t> const fmember { "fmember" };
+auto const fdproperty_def = identifier >> lit("=") >> fdvalue;
+auto const fdpropertyset_def = fdproperty >> *(-lit(",") >> fdproperty);
+auto const fdfield
+    = x3::rule<class fmember_id, ast::FDField> { "fdmember" }
+    = identifier >> lit("{") >> fdpropertyset >> lit("}");
 
-using fenum_t = pair<identifier_t, vector<fmember_t>>;
-x3::rule<class fenum_id, fenum_t> const fenum { "fenum" };
+auto const fdtypedef_def = lit("typedef") >> identifier >> '{' >> -fdpropertyset >> '}';
+auto const fdenum_def = lit("enumeration") >> identifier >> '{' >> -fdpropertyset >> *(fdfield) >> '}';
+auto const fdstruct_def = lit("struct") >> identifier >> '{' >> -fdpropertyset >> *(fdfield) >> '}';
+auto const import_def = lit("import") >> lexeme['"' >> identifier >> lit(".fidl") >> '"'];  // x3::lexeme assumes no skip parser, i. e. no whitespace in between
 
-using fstruct_mem_t = x3::variant<propertyset_t, fmember_t>;
-x3::rule<class fstruct_mem_id, fstruct_mem_t> const fstruct_mem { "fstruct_mem" };
-using fstruct_t = pair<identifier_t, vector<fstruct_mem_t>>;
-x3::rule<class fstruct_id, fstruct_t> const fstruct { "fstruct" };
+auto const fdtypedefinition
+    = x3::rule<class fdtypedefinition_id, ast::FDTypeDefinition> { "data" }
+    = fdtypedef | fdenum | fdstruct;
 
-using fqn_t = vector<identifier_t>;
-x3::rule<class fqn_id, fqn_t> const fqn { "fqn" };
+auto const fdtypes_def = lit("define") >> fqn >> lit("for") >> lit("typeCollection") >> fqn
+                                       >> "{" >> -fdpropertyset >> *fdtypedefinition >> "}";
 
-x3::rule<class import_id, identifier_t> const import { "import" };
-
-using data_t = x3::variant<propertyset_t, fenum_t, fstruct_t>;
-x3::rule<class data_id, data_t> const data { "data" };
-using dataset_t = vector<data_t>;
-x3::rule<class dataset_id, dataset_t> const dataset { "dataset" };
-
-using fdepl_define_header_t = pair<fqn_t, fqn_t>;
-x3::rule<class fdepl_define_header_id, fdepl_define_header_t> const fdepl_define_header { "fdepl_define_header" };
-using fdepl_define_t = pair<fdepl_define_header_t, boost::optional<dataset_t>>;
-x3::rule<class fdepl_define_id, fdepl_define_t> const fdepl_define { "fdepl_define" };
-
-using fdepl_full_t = pair<identifier_t, boost::optional<fdepl_define_t>>;
-x3::rule<class fdepl_full_id, fdepl_full_t> const fdepl_full { "fdepl_full" };
-
-auto const whitespace
-   = x3::blank
-   | x3::lexeme[ "//" >> *(x3::char_ - x3::eol) >> x3::eol ]
-   | x3::eol;
-
-template<typename T>
-void introspect(T &ctx) {
-   cout << "attr type: " << getTypeName(_attr(ctx)) << endl;
-   cout << "val type: " << getTypeName(_val(ctx)) << endl;
-};
-
-auto const identifier_def = x3::raw[lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
-auto const propvalue_def = bool_ | int_ | double_ | identifier;
-auto const property_def = identifier >> lit("=") >> propvalue;
-auto const propertyset_def = +(-lit(",") >> property);
-auto const fmember_def = identifier >> lit("{") >> propertyset >> lit("}");
-auto const fenum_def = lit("enumeration") >> identifier >> '{' >> *(fmember) >> '}';
-auto const fstruct_mem_def = propertyset | fmember;
-auto const fstruct_def = lit("struct") >> identifier >> '{' >> *(fstruct_mem) >> '}';
-auto const fqn_def = identifier % ".";
-auto const import_def = lit("import") >> lexeme['"' >> identifier >> lit(".fidl") >> '"'];
-auto const data_def = propertyset | fenum | fstruct;
-auto const dataset_def = +(data);
-auto const fdepl_define_header_def = lit("define") >> fqn >> lit("for") >> lit("typeCollection") >> fqn;
-auto const fdepl_define_def =  fdepl_define_header > lit("{") > -dataset > lit("}");
-auto const fdepl_full_def = import >> -fdepl_define;
-
-BOOST_SPIRIT_DEFINE(
-   identifier,
-   propvalue,
-   property,
-   propertyset,
-   fmember,
-   fenum,
-   fstruct_mem,
-   fstruct,
-   fqn,
-   import,
-   data,
-   dataset,
-   fdepl_define_header,
-   fdepl_define,
-   fdepl_full);
+auto const fdmodel_def = import >> *fdtypes;
 
 }

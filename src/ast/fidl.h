@@ -121,7 +121,6 @@ struct FModel
     std::string getPackageName() const;
 };
 
-
 }
 
 BOOST_FUSION_ADAPT_STRUCT(
