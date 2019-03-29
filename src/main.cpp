@@ -18,24 +18,12 @@ int main(int argc, const char *argv[])
         exit(1);
     }
 
-    bool ok;
-    string input = FrancaParser::readFile(argv[1], ok);
-    if (!ok) {
-        cerr << "Can't open input file " << argv[1] << endl << "Exiting" << endl;
-        exit(1);
-    }
-
-    auto first = input.begin();
-    auto last = input.end();
     ast::FModel output;
+    bool ok =FrancaParser::parse(argv[1], output);
 
     int i = 0;
-    x3::phrase_parse(first, last, franca::fmodel, franca::whitespace, output);
-    if (first != last) {
-        cout << endl << "Parsing failed at " << (first - input.begin()) << " of " << (last - input.begin()) << endl;
-        cout << endl << "Not parsed part: <=" << endl << string(first, last);
-        cout << "=>" << endl;
-    } else {
+    if (true == ok)
+    {
         cout << endl << "Successfully parsed fidl package " << output.getPackageName() << ", got " << output.typeCollections.size() << " typecollection";
         if (output.typeCollections.size() > 1) {
             cout << "s";
