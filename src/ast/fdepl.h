@@ -5,7 +5,7 @@
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/optional/optional.hpp>
 
-#include "common.h"
+#include "ast/common.h"
 
 namespace ast {
 using namespace std;
