@@ -41,6 +41,7 @@ string ast::FType::to_string::operator()(ast::FStruct f) const {
         out << " final";
     }
     out << endl;
+    out << "Tag is " << f.tag << endl;
     for (const FStructMember &mem : f.members) {
         if (mem.isArray) {
             out << "    vector<" << mem.type << "> " << mem.name;
@@ -91,7 +92,7 @@ ast::FAnnotationBlock ast::FType::getAnnotations() const
     return boost::apply_visitor(get_annotation(), *this).get();
 }
 
-pair<ast::FModel::TCIterator, ast::FModel::FTypeIterator> ast::FModel::findTypeByName(const string &name) const
+pair<ast::FModel::TCConstIterator, ast::FModel::FTypeConstIterator> ast::FModel::findTypeByName(const string &name) const
 {
     auto i_tc = typeCollections.cbegin();
     while (i_tc != typeCollections.cend()) {
@@ -103,6 +104,20 @@ pair<ast::FModel::TCIterator, ast::FModel::FTypeIterator> ast::FModel::findTypeB
         ++i_tc;
     }
     return { i_tc, typeCollections.back().types.cend() };
+}
+
+pair<ast::FModel::TCIterator, ast::FModel::FTypeIterator> ast::FModel::findTypeByName(const string &name)
+{
+    auto i_tc = typeCollections.begin();
+    while (i_tc != typeCollections.end()) {
+        FTypeCollection &tc = *i_tc;
+        auto i_t = find_if(tc.types.begin(), tc.types.end(), [&](const FType &t) { return t.getName() == name; });
+        if (i_t != tc.types.end()) {
+            return { i_tc, i_t };
+        }
+        ++i_tc;
+    }
+    return { i_tc, typeCollections.back().types.end() };
 }
 
 optional<ast::FType> ast::FModel::getTypeByName(const string &name) const
@@ -149,5 +164,27 @@ bool ast::FDTypeDefinition::isTypedef() const
     return getType() == ast::DefinitionType::TypeDef;
 }
 
+ast::FDValueType ast::FDValue::getType() const
+{
+    return boost::apply_visitor(get_type(), *this);
+}
 
+bool ast::FDValue::isBool() const
+{
+    return getType() == ast::FDValueType::Bool;
+}
 
+bool ast::FDValue::isInteger() const
+{
+    return getType() == ast::FDValueType::Integer;
+}
+
+bool ast::FDValue::isDouble() const
+{
+    return getType() == ast::FDValueType::Double;
+}
+
+bool ast::FDValue::isString() const
+{
+    return getType() == ast::FDValueType::String;
+}

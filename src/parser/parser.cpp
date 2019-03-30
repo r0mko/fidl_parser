@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <boost/variant.hpp>
 #include "ast/common.h"
 
 namespace x3 = boost::spirit::x3;
@@ -108,11 +109,29 @@ bool FrancaParser::mergeFdeplAndFidl(const ast::FDModel& fdmodel_ast, ast::FMode
    {
       for (const auto& fdtype : deployment.types)
       {
-//         auto type = fdtype.apply_visitor(ast::FDTypeDefinition::get_type());
-//         if (ast::DefinitionType::Struct == type)
-//         {
-            
-//         }
+         if (ast::DefinitionType::Struct == fdtype.getType())
+         {
+            const auto typeName = fdtype.getName();
+            auto iterPair = fmodel_ast.findTypeByName(typeName);
+            if (iterPair.first != fmodel_ast.typeCollections.end() &&
+                iterPair.second != iterPair.first->types.end())
+            {
+                const auto& fdstruct = boost::get<ast::FDStruct>(fdtype);
+                const auto it = std::find_if(fdstruct.properties.begin(),
+                                             fdstruct.properties.end(),
+                                             [](const ast::FDProperty& prop)
+                {
+                    return prop.name == "Tag";
+                });
+                if (it != fdstruct.properties.end() &&
+                    it->value.isInteger())
+                {
+                    const auto value = boost::get<int>(it->value);
+                    ast::FStruct& fstruct = boost::get<ast::FStruct>(*iterPair.second);
+                    fstruct.tag = value;
+                }
+            }
+         }
       }
    }
    return result;

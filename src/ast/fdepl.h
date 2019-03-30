@@ -13,13 +13,39 @@ namespace x3 = boost::spirit::x3;
 using boost::optional;
 
 
+enum class FDValueType
+{
+    Bool,
+    Integer,
+    Double,
+    String
+};
 
-using FDValue = x3::variant<bool, int, double, string>;
-//struct FDValue : x3::variant<bool, int, double, string>
-//{
-//    using base_type::base_type;
-//    using base_type::operator=;
-//};
+
+struct FDValue : x3::variant<bool, int, double, string>
+{
+    FDValue() = default;
+    FDValue(const FDValue&) = default;
+    FDValue& operator= (const FDValue&) = default;
+
+    using base_type::base_type;
+    using base_type::operator=;
+
+    ast::FDValueType getType() const;
+    bool isBool() const;
+    bool isInteger() const;
+    bool isDouble() const;
+    bool isString() const;
+
+private:
+   struct get_type : public boost::static_visitor<ast::FDValueType>
+   {
+      ast::FDValueType operator()(bool) const { return ast::FDValueType::Bool; }
+      ast::FDValueType operator()(int) const { return ast::FDValueType::Integer; }
+      ast::FDValueType operator()(double) const { return ast::FDValueType::Double; }
+      ast::FDValueType operator()(std::string) const { return ast::FDValueType::String; }
+   };
+};
 
 struct FDProperty
 {
@@ -55,7 +81,6 @@ struct FDStruct : FDTypebase
     vector<FDField> fields;
 };
 
-//using FDTypeDefinition = x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>;
 struct FDTypeDefinition : x3::variant<ast::FDEnumeration, ast::FDStruct, ast::FDTypedef>
 {
 private:

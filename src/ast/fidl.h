@@ -38,7 +38,7 @@ struct FStruct : FTypeBase
 {
     optional<string> polymorphic;
     vector<FStructMember> members;
-    int tag;
+    int tag{};
 };
 
 struct FTypeDef : FTypeBase
@@ -119,9 +119,12 @@ struct FModel
    ast::FQN packageName;
     // TODO: imports
    vector<FTypeCollection> typeCollections;
-   using TCIterator = decltype (typeCollections)::const_iterator;
-   using FTypeIterator = decltype (FTypeCollection::types)::const_iterator;
-   pair<TCIterator, FTypeIterator> findTypeByName(const string &name) const;
+   using TCConstIterator = decltype (typeCollections)::const_iterator;
+   using FTypeConstIterator = decltype (FTypeCollection::types)::const_iterator;
+   using TCIterator = decltype (typeCollections)::iterator;
+   using FTypeIterator = decltype (FTypeCollection::types)::iterator;
+   pair<TCConstIterator, FTypeConstIterator> findTypeByName(const string &name) const;
+   pair<TCIterator, FTypeIterator> findTypeByName(const string &name);
    optional<FType> getTypeByName(const string &name) const;
    std::string getPackageName() const;
 };
