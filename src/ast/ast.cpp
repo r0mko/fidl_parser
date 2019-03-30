@@ -41,7 +41,9 @@ string ast::FType::to_string::operator()(ast::FStruct f) const {
         out << " final";
     }
     out << endl;
-    out << "Tag is " << f.tag << endl;
+    if (f.tag){
+        out << "Tag is " << f.tag.get() << endl;
+    }
     for (const FStructMember &mem : f.members) {
         if (mem.isArray) {
             out << "    vector<" << mem.type << "> " << mem.name;

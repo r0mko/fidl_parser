@@ -38,7 +38,7 @@ struct FStruct : FTypeBase
 {
     optional<string> polymorphic;
     vector<FStructMember> members;
-    int tag{};
+    boost::optional<int> tag;
 };
 
 struct FTypeDef : FTypeBase
