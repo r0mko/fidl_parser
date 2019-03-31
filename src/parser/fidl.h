@@ -1,5 +1,5 @@
-#ifndef PARSER_FIDL_H
-#define PARSER_FIDL_H
+#pragma once
+
 
 #include <string>
 #include <iostream>
@@ -38,17 +38,17 @@ x3::rule<class fmodel_id, ast::FModel> const fmodel { "fmodel" };
 
 auto const polymorphic_clause_def
 = lit("polymorphic") >> x3::attr(string())
-                        | lit("extends") >> known_type_parser::i();
+                        | lit("extends") >> known_type;
 
 auto const array_braces = lit("[") >> lit("]") >> x3::attr(true);
 
-auto const struct_member_def = known_type_parser::i() >> -array_braces >> identifier;
+auto const struct_member_def = known_type >> -array_braces >> identifier;
 auto const fstruct_def =  -fannotation_block >> "struct" >> identifier >> -polymorphic_clause >> "{" >> *(struct_member) >> "}";
 
 auto const enum_member_def = identifier >> -("=" >> int_);
 auto const fenum_def = -fannotation_block >> "enumeration" >> identifier >> "{" >> *(enum_member) >> "}";
 
-auto const ftypedef_def = -fannotation_block >> "typedef" >> identifier >> "is" >> known_type_parser::i();
+auto const ftypedef_def = -fannotation_block >> "typedef" >> identifier >> "is" >> known_type;
 
 auto const version_def = lit("version") >> "{" >> lit("major") >> int_ >> lit("minor") >> int_ >> "}";
 auto const ftype_def = fstruct | ftypedef | fenum;
@@ -90,5 +90,3 @@ BOOST_SPIRIT_DEFINE(
         ftypecollection,
         fmodel);
 }
-
-#endif

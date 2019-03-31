@@ -1,5 +1,5 @@
-#ifndef PARSER_FDEPL_H
-#define PARSER_FDEPL_H
+#pragma once
+
 #include <boost/spirit/home/x3.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
 #include <string>
@@ -70,4 +70,3 @@ auto const fdmodel
 
 
 }
-#endif

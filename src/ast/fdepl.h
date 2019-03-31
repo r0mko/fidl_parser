@@ -12,6 +12,7 @@ using namespace std;
 namespace x3 = boost::spirit::x3;
 using boost::optional;
 
+
 enum class FDValueType
 {
     Bool,
@@ -19,6 +20,7 @@ enum class FDValueType
     Double,
     String
 };
+
 
 struct FDValue : x3::variant<bool, int, double, string>
 {
