@@ -3,17 +3,6 @@
 
 #include <string>
 
-static const std::string test_input = R"(
-struct {
-
-    Foo = 1, Bar = 0
-    Baz = 2, The_Answer = 42
-
-    Field1 { }
-    Field2 { }
-}
-)";
-
 static const std::string fdepl_string = R"(
 import "ADASISv3Messages.fidl"
 

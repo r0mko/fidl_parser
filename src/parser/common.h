@@ -1,5 +1,4 @@
-#ifndef PARSER_COMMON_H
-#define PARSER_COMMON_H
+#pragma once
 
 #include <boost/spirit/home/x3.hpp>
 #include <string>
@@ -26,17 +25,21 @@ using x3::_val;
 using x3::bool_;
 using x3::_attr;
 
-static struct known_type_parser : x3::symbols<std::string>
+struct known_type_parser : x3::symbols<std::string>
 {
     known_type_parser();
-} known_type;
 
+    static known_type_parser &i() {
+        static known_type_parser i;
+        return i;
+    }
+};
 
-auto const add_type = [](auto &ctx)
+const auto add_type = [](auto &ctx)
 {
     std::string name =_attr(ctx).getName();
-    std::cout << "Added new type " << name << std::endl;
-    known_type.add(name, name);
+//    std::cout << "Added new type " << name << " to symbols parser " << (known_type.addr())  << std::endl;
+    known_type_parser::i().add(name, name);
     _val(ctx).push_back(_attr(ctx));
 };
 
@@ -55,7 +58,7 @@ auto const package
 auto const whitespace
    = x3::blank
    | x3::lexeme[ "//" >> *(x3::char_ - x3::eol) >> x3::eol ]
-   | x3::eol;
+                         | x3::eol;
+
 
 }
-#endif // COMMON_H

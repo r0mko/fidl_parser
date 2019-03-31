@@ -1,5 +1,4 @@
-#ifndef AST_COMMON_H
-#define AST_COMMON_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -22,5 +21,3 @@ struct FQN : public vector<string>
 };
 
 }
-
-#endif // COMMON_H

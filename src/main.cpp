@@ -1,6 +1,5 @@
 #include <iostream>
 #include <map>
-
 #include "ast/ast.h"
 #include "parser/parser.h"
 #include "constants.h"
@@ -14,7 +13,7 @@ int main(int argc, const char *argv[])
     using namespace std;
 
     if (argc < 2) {
-        cerr << "No input file provided!" << endl <<  "Usage: spirit_parser [fidl_file]" << endl;
+        cerr << "No input file provided!" << endl <<  "Usage: spirit_parser [fdepl_file]" << endl;
         exit(1);
     }
 
@@ -45,8 +44,7 @@ int main(int argc, const char *argv[])
             }
         }
     }
-    cout << endl << "Known types: ";
-    franca::known_type.for_each([](string s, string ) { std::cout << s << " "; });
+    franca::known_type_parser::i().for_each([](string s, string ) { std::cout << s << " "; });
     std::cout<<std::endl;
 
     return 0;

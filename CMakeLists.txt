@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
 set(Boost_USE_STATIC_LIBS ON)
 
 if (UNIX)
-    set(BOOST_ROOT "/opt/local/include")
+    set(BOOST_ROOT "/usr/local/include")
     add_definitions(-D__UNIX__)
 endif (UNIX)
 
