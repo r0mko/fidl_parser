@@ -26,11 +26,10 @@ using x3::_val;
 using x3::bool_;
 using x3::_attr;
 
-static struct known_type_parser : x3::symbols<std::string>
+extern struct known_type_parser : x3::symbols<std::string>
 {
     known_type_parser();
 } known_type;
-
 
 auto const add_type = [](auto &ctx)
 {

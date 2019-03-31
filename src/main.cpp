@@ -7,6 +7,8 @@
 
 using namespace std;
 
+franca::known_type_parser franca::known_type = franca::known_type_parser();
+
 int main(int argc, const char *argv[])
 {
 
