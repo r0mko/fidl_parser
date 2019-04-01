@@ -10,7 +10,7 @@
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
-// --- teset
+// --- test
 
 using namespace std;
 
@@ -18,12 +18,6 @@ franca::known_type_parser franca::known_type = franca::known_type_parser();
 
 namespace ast2 {
 namespace x3 = boost::spirit::x3;
-
-struct VarDef : x3::position_tagged
-{
-    std::string type;
-    std::string name;
-};
 
 struct StructField : x3::position_tagged
 {
@@ -50,7 +44,6 @@ struct Definition : x3::variant<Typedef, StructDef>
 };
 }
 
-BOOST_FUSION_ADAPT_STRUCT(ast2::VarDef, type, name)
 BOOST_FUSION_ADAPT_STRUCT(ast2::StructField, type, name)
 BOOST_FUSION_ADAPT_STRUCT(ast2::StructDef, name, fields)
 BOOST_FUSION_ADAPT_STRUCT(ast2::Typedef, name, targetType)
@@ -85,12 +78,10 @@ auto const identifier
 using franca::known_type_parser;
 const known_type_parser known_type_p = known_type_parser();
 const auto known_type = x3::rule<class known_type_id, std::string> { "known type" } = known_type_p;
-const x3::rule<vardef_id, ast2::VarDef> vardef { "var_def" };
 const x3::rule<struct_field_id, ast2::StructField> struct_field { "struct_field" };
 const x3::rule<struct_def_id, ast2::StructDef> struct_def { "struct" };
 const x3::rule<typealias_id, ast2::Typedef> typealias { "struct" };
 
-const auto vardef_def = known_type > identifier;
 const auto struct_field_def = known_type > identifier > ";";
 const auto struct_fields = x3::rule<class struct_fields_id, std::vector<ast2::StructField>> {"struct_fields"} = *(struct_field);
 const auto struct_def_def = "struct" > identifier > "{" > struct_fields > "}" > ";";
@@ -98,12 +89,11 @@ const auto typealias_def = "typedef" > identifier > "is" > known_type > ";";
 const auto definition = x3::rule<class definition_id, ast2::Definition> {"definition of type"} = typealias | struct_def;
 const auto model = x3::rule<model_id, std::vector<ast2::Definition>> {"model"} = +(definition);
 
-BOOST_SPIRIT_DEFINE(vardef, struct_field, struct_def, typealias);
+BOOST_SPIRIT_DEFINE(struct_field, struct_def, typealias);
 
 struct identifier_id : x3::annotate_on_success{};
 struct struct_def_id : error_handler, x3::annotate_on_success {};
 struct struct_field_id : x3::annotate_on_success {};
-struct vardef_id : x3::annotate_on_success {};
 struct typealias_id : error_handler, x3::annotate_on_success {};
 struct model_id : error_handler, x3::annotate_on_success {};
 
