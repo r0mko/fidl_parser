@@ -47,7 +47,7 @@ private:
    };
 };
 
-struct FDProperty
+struct FDProperty : x3::position_tagged
 {
     string name;
     FDValue value;
@@ -55,13 +55,13 @@ struct FDProperty
 
 using FDPropertySet = vector<FDProperty>;
 
-struct FDField
+struct FDField : x3::position_tagged
 {
     string name;
     vector<FDProperty> properties;
 };
 
-struct FDTypebase
+struct FDTypebase : x3::position_tagged
 {
     string name;
     FDPropertySet properties;
@@ -113,7 +113,7 @@ public:
    bool isTypedef() const;
 };
 
-struct FDTypes
+struct FDTypes : x3::position_tagged
 {
     FQN name;
     FQN typeCollectionName;
@@ -121,7 +121,7 @@ struct FDTypes
     vector<FDTypeDefinition> types;
 };
 
-struct FDModel
+struct FDModel : x3::position_tagged
 {
     FQN packageName;
     vector<string> imports;

@@ -80,9 +80,22 @@ bool FrancaParser::parseFdepl(const std::string& filename, ast::FDModel& fdmodel
    std::string fdepl;
    bool result = readFile(filename, fdepl);
    
+   typedef std::string::const_iterator iterator_type;
+   
+   iterator_type iter = fdepl.begin();
+   iterator_type const end = fdepl.end();
+   
+   using boost::spirit::x3::with;
+   using boost::spirit::x3::error_handler_tag;
+   using error_handler_type = boost::spirit::x3::error_handler<iterator_type>;
+   
+   error_handler_type error_handler(iter, end, std::cout);
+   
+   auto const parser = with<error_handler_tag>(std::ref(error_handler)) [ franca::fdmodel ];
+   
    if (true == result)
    {
-      result = x3::phrase_parse(fdepl.begin(), fdepl.end(), franca::fdmodel, franca::whitespace, fdmodel_ast);
+      result = x3::phrase_parse(fdepl.begin(), fdepl.end(), parser, franca::whitespace, fdmodel_ast);
    }
    
    return result;

@@ -25,48 +25,55 @@ using x3::_val;
 using x3::_attr;
 
 auto const fdvalue
-    = x3::rule<class fdvalue_id, ast::FDValue> { "propvalue" }
+    = x3::rule<struct fdvalue_id, ast::FDValue> { "propvalue" }
     = bool_ | int_ | double_ | identifier;
 
 auto const fdproperty
-   = x3::rule<class property_id, ast::FDProperty> { "property" }
-   = identifier >> lit("=") >> fdvalue;
+   = x3::rule<struct property_id, ast::FDProperty> { "property" }
+   = identifier >> lit("=") > fdvalue;
+struct property_id : error_handler, x3::annotate_on_success {};
 
 auto const fdpropertyset
-   = x3::rule<class propertyset_id, ast::FDPropertySet> { "propertyset" }
+   = x3::rule<struct propertyset_id, ast::FDPropertySet> { "propertyset" }
    = fdproperty >> *(-lit(",") >> fdproperty);
 
 auto const fdfield
-    = x3::rule<class fmember_id, ast::FDField> { "fdmember" }
+    = x3::rule<struct fmember_id, ast::FDField> { "fdmember" }
     = identifier >> lit("{") >> fdpropertyset >> lit("}");
+struct fmember_id : error_handler, x3::annotate_on_success {};
 
 auto const fdtypedef
-   = x3::rule<class fdtypedef_id, ast::FDTypedef> { "fdtypedef" }
-   = lit("typedef") >> identifier >> '{' >> -fdpropertyset >> '}';
+   = x3::rule<struct fdtypedef_id, ast::FDTypedef> { "fdtypedef" }
+   = lit("typedef") > identifier > '{' >> -fdpropertyset > '}';
+struct fdtypedef_id : error_handler, x3::annotate_on_success {};
 
 auto const fdenum
-   = x3::rule<class fdenum_id, ast::FDEnumeration> { "fdenum" }
-   = lit("enumeration") >> identifier >> '{' >> -fdpropertyset >> *(fdfield) >> '}';
+   = x3::rule<struct fdenum_id, ast::FDEnumeration> { "fdenum" }
+   = lit("enumeration") > identifier > '{' >> -fdpropertyset >> *(fdfield) > '}';
+struct fdenum_id : error_handler, x3::annotate_on_success {};
 
 auto const fdstruct
-   = x3::rule<class fdstruct_id, ast::FDStruct> { "fdstruct" }
-   = lit("struct") >> identifier >> '{' >> -fdpropertyset >> *(fdfield) >> '}';
+   = x3::rule<struct fdstruct_id, ast::FDStruct> { "fdstruct" }
+   = lit("struct") > identifier > '{' >> -fdpropertyset >> *(fdfield) > '}';
+struct fdstruct_id : error_handler, x3::annotate_on_success {};
 
 auto const import
-   = x3::rule<class import_id, string> { "import" }
-   = lit("import") >> lexeme['"' >> identifier >> lit(".fidl") >> '"'];  // x3::lexeme assumes no skip parser, i. e. no whitespace in between
+   = x3::rule<struct import_id, string> { "import" }
+   = lit("import") > lexeme['"' > identifier > lit(".fidl") > '"'];  // x3::lexeme assumes no skip parser, i. e. no whitespace in between
 
 auto const fdtypedefinition
-    = x3::rule<class fdtypedefinition_id, ast::FDTypeDefinition> { "data" }
+    = x3::rule<struct fdtypedefinition_id, ast::FDTypeDefinition> { "data" }
     = fdtypedef | fdenum | fdstruct;
 
 auto const fdtypes
-   = x3::rule<class fdtypes_id, ast::FDTypes> { "fdtypes" }
-   = lit("define") >> fqn >> lit("for") >> lit("typeCollection") >> fqn >> "{" >> -fdpropertyset >> *fdtypedefinition >> "}";
+   = x3::rule<struct fdtypes_id, ast::FDTypes> { "fdtypes" }
+   = lit("define") > fqn > lit("for") > lit("typeCollection") > fqn >> "{" >> -fdpropertyset >> *fdtypedefinition > "}";
+struct fdtypes_id : error_handler, x3::annotate_on_success {};
 
 auto const fdmodel
-   = x3::rule<class fdmodel_id, ast::FDModel> { "fdmodel" }
+   = x3::rule<struct fdmodel_id, ast::FDModel> { "fdmodel" }
    = -package >> *(import) >> *fdtypes;
+struct fdmodel_id : error_handler, x3::annotate_on_success {};
 
 
 }
