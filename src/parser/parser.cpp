@@ -22,6 +22,18 @@ franca::known_type_parser::known_type_parser() {
     add("String", "String");
 }
 
+franca::keywords_t::keywords_t() {
+   add("struct", "struct");
+   add("enumeration", "enumeration");
+   add("polymorphic", "polymorphic");
+   add("extends", "extends");
+   add("typedef", "typedef");
+   add("version", "version");
+   add("typeCollection", "typeCollection");
+   add("import", "import");
+   add("define", "define");
+}
+
 namespace {
 
 bool readFile(const std::string &filename, std::string& out)

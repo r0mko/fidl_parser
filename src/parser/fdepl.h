@@ -30,32 +30,27 @@ auto const fdvalue
 
 auto const fdproperty
    = x3::rule<struct property_id, ast::FDProperty> { "property" }
-   = identifier >> lit("=") > fdvalue;
-struct property_id : error_handler, x3::annotate_on_success {};
+   = identifier >> !lit("{") > lit("=") > fdvalue;
 
 auto const fdpropertyset
    = x3::rule<struct propertyset_id, ast::FDPropertySet> { "propertyset" }
    = fdproperty >> *(-lit(",") >> fdproperty);
 
 auto const fdfield
-    = x3::rule<struct fmember_id, ast::FDField> { "fdmember" }
-    = identifier >> lit("{") >> fdpropertyset >> lit("}");
-struct fmember_id : error_handler, x3::annotate_on_success {};
+   = x3::rule<struct fmember_id, ast::FDField> { "fdmember" }
+   = identifier > lit("{") > fdpropertyset > lit("}");
 
 auto const fdtypedef
    = x3::rule<struct fdtypedef_id, ast::FDTypedef> { "fdtypedef" }
    = lit("typedef") > identifier > '{' >> -fdpropertyset > '}';
-struct fdtypedef_id : error_handler, x3::annotate_on_success {};
 
 auto const fdenum
    = x3::rule<struct fdenum_id, ast::FDEnumeration> { "fdenum" }
-   = lit("enumeration") > identifier > '{' >> -fdpropertyset >> *(fdfield) > '}';
-struct fdenum_id : error_handler, x3::annotate_on_success {};
+   = lit("enumeration") > identifier > '{' > -fdpropertyset > *(fdfield) > '}';
 
 auto const fdstruct
    = x3::rule<struct fdstruct_id, ast::FDStruct> { "fdstruct" }
-   = lit("struct") > identifier > '{' >> -fdpropertyset >> *(fdfield) > '}';
-struct fdstruct_id : error_handler, x3::annotate_on_success {};
+   = lit("struct") > identifier > '{' > -fdpropertyset > *(fdfield) > '}';
 
 auto const import
    = x3::rule<struct import_id, string> { "import" }
@@ -67,12 +62,12 @@ auto const fdtypedefinition
 
 auto const fdtypes
    = x3::rule<struct fdtypes_id, ast::FDTypes> { "fdtypes" }
-   = lit("define") > fqn > lit("for") > lit("typeCollection") > fqn >> "{" >> -fdpropertyset >> *fdtypedefinition > "}";
-struct fdtypes_id : error_handler, x3::annotate_on_success {};
+   = lit("define") > fqn > lit("for") > lit("typeCollection") > fqn >
+      "{" > -fdpropertyset > *fdtypedefinition > "}";
 
 auto const fdmodel
    = x3::rule<struct fdmodel_id, ast::FDModel> { "fdmodel" }
-   = -package >> *(import) >> *fdtypes;
+   = -package > *(import) > *fdtypes;
 struct fdmodel_id : error_handler, x3::annotate_on_success {};
 
 

@@ -47,7 +47,8 @@ auto const struct_member
 
 auto const fstruct
    = x3::rule<struct fstruct_id, ast::FStruct> { "fstruct" }
-   =  -fannotation_block >> "struct" > identifier >> -polymorphic_clause > "{" >> *(struct_member) > "}";
+   = -fannotation_block >> "struct" > identifier >> -polymorphic_clause >
+   "{" >> *(struct_member) > "}";
 
 auto const enum_member
    = x3::rule<struct enum_member_id, ast::FEnum_Member> { "enum_member" }

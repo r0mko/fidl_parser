@@ -33,6 +33,11 @@ extern struct known_type_parser : x3::symbols<std::string>
     known_type_parser();
 } known_type;
 
+static struct keywords_t : x3::symbols<std::string>
+{
+   keywords_t();
+} keywords;
+
 auto const add_type = [](auto &ctx)
 {
     std::string name =_attr(ctx).getName();
@@ -43,7 +48,7 @@ auto const add_type = [](auto &ctx)
 
 auto const identifier
    = x3::rule<class identifier_id, std::string> { "identifier" }
-   = x3::raw[x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]];
+   = x3::raw[x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')]] - keywords;
 
 auto const fqn
    = x3::rule<class fqn_id, ast::FQN> { "fqn" }
