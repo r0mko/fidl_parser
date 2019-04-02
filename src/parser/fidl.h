@@ -22,71 +22,83 @@ using x3::_val;
 using x3::bool_;
 using x3::_attr;
 
-x3::rule<class fstruct_id, ast::FStruct> const fstruct { "fstruct" };
-x3::rule<class struct_member_id, ast::FStructMember> const struct_member { "struct_member" };
-x3::rule<class polymorphic_clause, string> const polymorphic_clause { "polymorphic_clause" };
-x3::rule<class ftypedef_id, ast::FTypeDef> const ftypedef { "ftypedef" };
-x3::rule<class fenum_id, ast::FEnum> const fenum { "fenum" };
-x3::rule<class enum_member_id, ast::FEnum_Member> const enum_member { "enum_member" };
-x3::rule<class ftype_id, ast::FType> const ftype { "ftype" };
-x3::rule<class version_id, ast::FVersion> const version { "version" };
-x3::rule<class types_set_id, vector<ast::FType>> const types_set { "types_set" };
-x3::rule<class ftypecollection_id, ast::FTypeCollection> const ftypecollection { "type_collection" };
-x3::rule<class fannotation_id, ast::FAnnotation> const fannotation { "fannotation" };
-x3::rule<class fannotation_block_id, ast::FAnnotationBlock> const fannotation_block { "fannotation_block" };
-x3::rule<class fmodel_id, ast::FModel> const fmodel { "fmodel" };
+auto const annotation_text
+   = x3::rule<struct annotation_text_id, std::string> {"annotation_text"}
+   = x3::lexeme[*(x3::char_ - (lit("**>") | lit("@"))) ];
 
-auto const polymorphic_clause_def
-= lit("polymorphic") >> x3::attr(string())
+auto const fannotation
+   = x3::rule<struct fannotation_id, ast::FAnnotation> { "fannotation" }
+   = lit("@") >> identifier >> ":" >> annotation_text;
+
+auto const fannotation_block
+   = x3::rule<struct fannotation_block_id, ast::FAnnotationBlock> { "fannotation_block" }
+   = lit("<**") >> *fannotation >> "**>";
+
+auto const polymorphic_clause
+   = x3::rule<struct polymorphic_id, string> { "polymorphic_clause" }
+   = lit("polymorphic") >> x3::attr(string())
                         | lit("extends") >> known_type;
 
 auto const array_braces = lit("[") >> lit("]") >> x3::attr(true);
 
-auto const struct_member_def = known_type >> -array_braces >> identifier;
-auto const fstruct_def =  -fannotation_block >> "struct" >> identifier >> -polymorphic_clause >> "{" >> *(struct_member) >> "}";
+auto const struct_member
+   = x3::rule<struct struct_member_id, ast::FStructMember> { "struct_member" }
+   = known_type >> -array_braces >> identifier;
 
-auto const enum_member_def = identifier >> -("=" >> int_);
-auto const fenum_def = -fannotation_block >> "enumeration" >> identifier >> "{" >> *(enum_member) >> "}";
+auto const fstruct
+   = x3::rule<struct fstruct_id, ast::FStruct> { "fstruct" }
+   =  -fannotation_block >> "struct" >> identifier >> -polymorphic_clause >> "{" >> *(struct_member) >> "}";
 
-auto const ftypedef_def = -fannotation_block >> "typedef" >> identifier >> "is" >> known_type;
+auto const enum_member
+   = x3::rule<struct enum_member_id, ast::FEnum_Member> { "enum_member" }
+   = identifier >> -("=" >> int_);
 
-auto const version_def = lit("version") >> "{" >> lit("major") >> int_ >> lit("minor") >> int_ >> "}";
-auto const ftype_def = fstruct | ftypedef | fenum;
-auto const types_set_def = *(ftype[add_type]);
-auto const ftypecollection_def = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
+auto const fenum
+   = x3::rule<struct fenum_id, ast::FEnum> { "fenum" }
+   = -fannotation_block >> "enumeration" >> identifier >> "{" >> *(enum_member) >> "}";
 
-auto const annotation_text = x3::rule<class annotation_text_id, std::string>{} = x3::lexeme[*(x3::char_ - (lit("**>") | lit("@"))) ];
-auto const fannotation_def = lit("@") >> identifier >> ":" >> annotation_text;
-auto const fannotation_block_def = lit("<**") >> *fannotation >> "**>";
+auto const ftypedef
+   = x3::rule<struct ftypedef_id, ast::FTypeDef> { "ftypedef" }
+   = -fannotation_block >> "typedef" >> identifier >> "is" >> known_type;
 
-auto const fmodel_def = package >> *ftypecollection;
+auto const version
+   = x3::rule<struct version_id, ast::FVersion> { "version" }
+   = lit("version") >> "{" >> lit("major") >> int_ >> lit("minor") >> int_ >> "}";
+
+auto const ftype
+   = x3::rule<struct ftype_id, ast::FType> { "ftype" }
+   = fstruct | ftypedef | fenum;
+
+auto const types_set
+   = x3::rule<struct types_set_id, vector<ast::FType>> { "types_set" }
+   = *(ftype[add_type]);
+
+auto const ftypecollection
+   = x3::rule<struct ftypecollection_id, ast::FTypeCollection> { "type_collection" }
+   = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
+
+auto const fmodel
+   = x3::rule<struct fmodel_id, ast::FModel> { "fmodel" }
+   = package >> *ftypecollection;
 
 // FIXME: remove
 using property_t = pair<string, int>;
-auto const property = x3::rule<class property_id, property_t> {"property"} = identifier >> lit("=") >> int_;
+auto const property
+   = x3::rule<struct property_id, property_t> {"property"}
+   = identifier >> lit("=") >> int_;
 
-auto const propertyset = x3::rule<class propertyset_id, vector<property_t>> {"propertyset"} =
-        property >> *(-lit(",") >> property);
+auto const propertyset
+   = x3::rule<struct propertyset_id, vector<property_t>> {"propertyset"}
+   = property >> *(-lit(",") >> property);
 
-auto const field = x3::rule<class field_id, string> {"field"} =
-    identifier >> lit("{") >> lit("}");
+auto const field
+   = x3::rule<struct field_id, string> {"field"}
+   = identifier >> lit("{") >> lit("}");
+
 using structf_t = pair<vector<property_t>, vector<string>>;
-auto const structf = x3::rule<class structf_id, structf_t> {"structf"}
-    = lit("struct") >> "{" >> -propertyset >> *field >> "}";
+auto const structf
+   = x3::rule<struct structf_id, structf_t> {"structf"}
+   = lit("struct") >> "{" >> -propertyset >> *field >> "}";
 
 
-BOOST_SPIRIT_DEFINE(
-        polymorphic_clause,
-        fannotation,
-        fannotation_block,
-        struct_member,
-        fstruct,
-        fenum,
-        enum_member,
-        ftypedef,
-        ftype,
-        version,
-        types_set,
-        ftypecollection,
-        fmodel);
 }
