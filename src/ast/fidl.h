@@ -18,7 +18,7 @@ using namespace std;
 namespace x3 = boost::spirit::x3;
 using boost::optional;
 
-struct FStructMember
+struct FStructMember : x3::position_tagged
 {
     string type;
     optional<bool> isArray;
@@ -28,7 +28,7 @@ struct FStructMember
 using FAnnotation = std::pair<string, string>;
 using FAnnotationBlock = std::vector<FAnnotation>;
 
-struct FTypeBase
+struct FTypeBase : x3::position_tagged
 {
     optional<FAnnotationBlock> annotation;
     string name;
@@ -99,13 +99,13 @@ public:
 
 ostream & operator << (ostream &out, FType t);
 
-struct FVersion
+struct FVersion : x3::position_tagged
 {
     int major = 0;
     int minor = 0;
 };
 
-struct FTypeCollection
+struct FTypeCollection : x3::position_tagged
 {
     string name;
     optional<FVersion> version;
@@ -114,7 +114,7 @@ struct FTypeCollection
     DefinitionType getTypeByName(const string &name) const;
 };
 
-struct FModel
+struct FModel : x3::position_tagged
 {
    ast::FQN packageName;
     // TODO: imports

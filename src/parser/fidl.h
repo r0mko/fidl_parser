@@ -43,27 +43,27 @@ auto const array_braces = lit("[") >> lit("]") >> x3::attr(true);
 
 auto const struct_member
    = x3::rule<struct struct_member_id, ast::FStructMember> { "struct_member" }
-   = known_type >> -array_braces >> identifier;
+   = known_type > -array_braces > identifier;
 
 auto const fstruct
    = x3::rule<struct fstruct_id, ast::FStruct> { "fstruct" }
-   =  -fannotation_block >> "struct" >> identifier >> -polymorphic_clause >> "{" >> *(struct_member) >> "}";
+   =  -fannotation_block >> "struct" > identifier >> -polymorphic_clause > "{" >> *(struct_member) > "}";
 
 auto const enum_member
    = x3::rule<struct enum_member_id, ast::FEnum_Member> { "enum_member" }
-   = identifier >> -("=" >> int_);
+   = identifier >> -("=" > int_);
 
 auto const fenum
    = x3::rule<struct fenum_id, ast::FEnum> { "fenum" }
-   = -fannotation_block >> "enumeration" >> identifier >> "{" >> *(enum_member) >> "}";
+   = -fannotation_block >> "enumeration" > identifier > "{" >> *(enum_member) > "}";
 
 auto const ftypedef
    = x3::rule<struct ftypedef_id, ast::FTypeDef> { "ftypedef" }
-   = -fannotation_block >> "typedef" >> identifier >> "is" >> known_type;
+   = -fannotation_block >> "typedef" > identifier > "is" > known_type;
 
 auto const version
    = x3::rule<struct version_id, ast::FVersion> { "version" }
-   = lit("version") >> "{" >> lit("major") >> int_ >> lit("minor") >> int_ >> "}";
+   = lit("version") > "{" > lit("major") > int_ > lit("minor") > int_ > "}";
 
 auto const ftype
    = x3::rule<struct ftype_id, ast::FType> { "ftype" }
@@ -75,30 +75,11 @@ auto const types_set
 
 auto const ftypecollection
    = x3::rule<struct ftypecollection_id, ast::FTypeCollection> { "type_collection" }
-   = lit("typeCollection") >> identifier >> "{" >> -(version) >> types_set >> "}";
+   = lit("typeCollection") > identifier > "{" >> -(version) >> types_set > "}";
 
 auto const fmodel
    = x3::rule<struct fmodel_id, ast::FModel> { "fmodel" }
    = package >> *ftypecollection;
-
-// FIXME: remove
-using property_t = pair<string, int>;
-auto const property
-   = x3::rule<struct property_id, property_t> {"property"}
-   = identifier >> lit("=") >> int_;
-
-auto const propertyset
-   = x3::rule<struct propertyset_id, vector<property_t>> {"propertyset"}
-   = property >> *(-lit(",") >> property);
-
-auto const field
-   = x3::rule<struct field_id, string> {"field"}
-   = identifier >> lit("{") >> lit("}");
-
-using structf_t = pair<vector<property_t>, vector<string>>;
-auto const structf
-   = x3::rule<struct structf_id, structf_t> {"structf"}
-   = lit("struct") >> "{" >> -propertyset >> *field >> "}";
-
+struct fmodel_id : error_handler, x3::annotate_on_success {};
 
 }
