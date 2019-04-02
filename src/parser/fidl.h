@@ -28,16 +28,16 @@ auto const annotation_text
 
 auto const fannotation
    = x3::rule<struct fannotation_id, ast::FAnnotation> { "fannotation" }
-   = lit("@") >> identifier >> ":" >> annotation_text;
+   = lit("@") > identifier > ":" > annotation_text;
 
 auto const fannotation_block
    = x3::rule<struct fannotation_block_id, ast::FAnnotationBlock> { "fannotation_block" }
-   = lit("<**") >> *fannotation >> "**>";
+   = lit("<**") > *fannotation > "**>";
 
 auto const polymorphic_clause
    = x3::rule<struct polymorphic_id, string> { "polymorphic_clause" }
    = lit("polymorphic") >> x3::attr(string())
-                        | lit("extends") >> known_type;
+                        | lit("extends") > known_type;
 
 auto const array_braces = lit("[") >> lit("]") >> x3::attr(true);
 
@@ -47,16 +47,16 @@ auto const struct_member
 
 auto const fstruct
    = x3::rule<struct fstruct_id, ast::FStruct> { "fstruct" }
-   = -fannotation_block >> "struct" > identifier >> -polymorphic_clause >
-   "{" >> *(struct_member) > "}";
+   = -fannotation_block >> "struct" > identifier > -polymorphic_clause >
+   "{" > *(struct_member) > "}";
 
 auto const enum_member
    = x3::rule<struct enum_member_id, ast::FEnum_Member> { "enum_member" }
-   = identifier >> -("=" > int_);
+   = identifier >> -(lit("=") > int_);
 
 auto const fenum
    = x3::rule<struct fenum_id, ast::FEnum> { "fenum" }
-   = -fannotation_block >> "enumeration" > identifier > "{" >> *(enum_member) > "}";
+   = -fannotation_block >> "enumeration" > identifier > "{" > *(enum_member) > "}";
 
 auto const ftypedef
    = x3::rule<struct ftypedef_id, ast::FTypeDef> { "ftypedef" }
@@ -76,11 +76,11 @@ auto const types_set
 
 auto const ftypecollection
    = x3::rule<struct ftypecollection_id, ast::FTypeCollection> { "type_collection" }
-   = lit("typeCollection") > identifier > "{" >> -(version) >> types_set > "}";
+   = lit("typeCollection") > identifier > "{" > -(version) > types_set > "}";
 
 auto const fmodel
    = x3::rule<struct fmodel_id, ast::FModel> { "fmodel" }
-   = package >> *ftypecollection;
+   = package > *ftypecollection;
 struct fmodel_id : error_handler, x3::annotate_on_success {};
 
 }
