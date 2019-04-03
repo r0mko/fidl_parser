@@ -1,8 +1,6 @@
 #include "parser.h"
 #include <fstream>
 #include <sstream>
-#include <boost/filesystem.hpp>
-#include <boost/variant.hpp>
 #include "ast/common.h"
 
 namespace x3 = boost::spirit::x3;
@@ -25,47 +23,49 @@ franca::known_type_parser::known_type_parser() {
 
 bool FrancaParser::parse(const std::string& filename, ast::FModel& fmodel_ast)
 {
-   boost::filesystem::path fdepl_path(filename);
    bool result = false;
    
    do
    {
-      result = boost::filesystem::exists(fdepl_path);
-      if (false == result)
-      {
-         std::cerr<<"File "<<fdepl_path.string()<<" does not exist"<<std::endl;
-         break;
-      }
-      
-      boost::filesystem::path dir = fdepl_path.parent_path();
-      
       ast::FDModel fdmodel_ast;
-      result = parseFdepl(fdepl_path.string(), fdmodel_ast);
+      result = parseFdepl(filename, fdmodel_ast);
       if (false == result)
       {
-         std::cerr<<"Error parsing FDepl "<<fdepl_path.string()<<std::endl;
+         std::cerr<<"Error parsing FDepl "<<filename<<std::endl;
          break;
       }
       
       result = (false == fdmodel_ast.imports.empty());
       if (false == result)
       {
-         std::cerr<<"No imports in FDepl "<<fdepl_path.string()<<std::endl;
+         std::cerr<<"No imports in FDepl "<<filename<<std::endl;
          break;
       }
       
-      boost::filesystem::path fidl_path = dir / (fdmodel_ast.imports.at(0) + ".fidl");
-      result = parseFidl(fidl_path.string(), fmodel_ast);
+      std::string fidl_path;
+      size_t del_pos = filename.find_last_of("\\/");
+      if (del_pos != std::string::npos)
+      {
+         std::string dir = filename.substr(0, del_pos);
+         char delimiter = filename.at(del_pos);
+         fidl_path = dir + delimiter + (fdmodel_ast.imports.at(0) + ".fidl");
+      }
+      else
+      {
+         fidl_path = fdmodel_ast.imports.at(0) + ".fidl";
+      }
+      
+      result = parseFidl(fidl_path, fmodel_ast);
       if (false == result)
       {
-         std::cerr<<"Error parsing Fidl "<<fidl_path.string()<<std::endl;
+         std::cerr<<"Error parsing Fidl "<<fidl_path<<std::endl;
          break;
       }
       
       result = mergeFdeplAndFidl(fdmodel_ast, fmodel_ast);
       if (false == result)
       {
-         std::cerr<<"Error merging FDepl "<<fdepl_path.string()<< " and Fidl " << fidl_path.string() <<std::endl;
+         std::cerr<<"Error merging FDepl "<< filename << " and Fidl " << fidl_path <<std::endl;
          break;
       }
       
