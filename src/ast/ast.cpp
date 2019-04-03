@@ -29,7 +29,7 @@ ostream &ast::operator <<(ostream &out, ast::FType t)
     return out;
 }
 
-string ast::FType::to_string::operator()(ast::FStruct f) const {
+string ast::FType::to_string::operator()(const ast::FStruct& f) const {
     ostringstream out;
     out << "struct " << f.name;
     if (f.polymorphic) {
@@ -55,7 +55,7 @@ string ast::FType::to_string::operator()(ast::FStruct f) const {
     return out.str();
 }
 
-string ast::FType::to_string::operator()(ast::FEnum e) const {
+string ast::FType::to_string::operator()(const ast::FEnum& e) const {
     ostringstream out;
     out << "enum " << e.name << endl;
     for (FEnum_Member mem : e.members) {
@@ -68,7 +68,7 @@ string ast::FType::to_string::operator()(ast::FEnum e) const {
     return out.str();
 }
 
-string ast::FType::to_string::operator()(ast::FTypeDef t) const {
+string ast::FType::to_string::operator()(const ast::FTypeDef& t) const {
     ostringstream out;
     out << "typedef " << t.name << " -> " << t.type;
     return out.str();

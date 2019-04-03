@@ -91,9 +91,9 @@ public:
 
     struct to_string : public boost::static_visitor<string>
     {
-        string operator()(FStruct f) const;
-        string operator()(FEnum e) const;
-        string operator()(FTypeDef t) const;
+        string operator()(const FStruct& f) const;
+        string operator()(const FEnum& e) const;
+        string operator()(const FTypeDef& t) const;
     };
 };
 

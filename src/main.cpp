@@ -11,8 +11,6 @@ franca::known_type_parser franca::known_type = franca::known_type_parser();
 
 int main(int argc, const char *argv[])
 {
-
-    namespace x3 = boost::spirit::x3;
     using namespace std;
 
     if (argc < 2) {
@@ -23,7 +21,6 @@ int main(int argc, const char *argv[])
     ast::FModel output;
     bool ok = FrancaParser::parse(argv[1], output);
 
-    int i = 0;
     if (true == ok)
     {
         cout << endl << "Successfully parsed fidl package " << output.getPackageName() << ", got " << output.typeCollections.size() << " typecollection";
@@ -31,6 +28,8 @@ int main(int argc, const char *argv[])
             cout << "s";
         }
         cout << endl;
+        
+        int i = 0;
         for (const ast::FTypeCollection &tc : output.typeCollections) {
             cout << "TypeCollection " << tc.name;
             if (!tc.version) {

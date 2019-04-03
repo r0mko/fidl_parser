@@ -55,7 +55,7 @@ bool parseT(const std::string& filename,
    std::string fdepl;
    bool result = readFile(filename, fdepl);
    
-   typedef std::string::const_iterator iterator_type;
+   using iterator_type = std::string::const_iterator;
    
    iterator_type iter = fdepl.begin();
    iterator_type const end = fdepl.end();
@@ -158,7 +158,7 @@ bool FrancaParser::mergeFdeplAndFidl(const ast::FDModel& fdmodel_ast, ast::FMode
                     it->value.isInteger())
                 {
                     const auto value = boost::get<int>(it->value);
-                    ast::FStruct& fstruct = boost::get<ast::FStruct>(*iterPair.second);
+                    auto& fstruct = boost::get<ast::FStruct>(*iterPair.second);
                     fstruct.tag = value;
                 }
             }
