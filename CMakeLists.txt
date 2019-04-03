@@ -10,7 +10,7 @@ if (UNIX)
     add_definitions(-D__UNIX__)
 endif (UNIX)
 
-find_package (Boost 1.65 REQUIRED COMPONENTS system filesystem)
+find_package (Boost 1.65 REQUIRED COMPONENTS system)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
@@ -29,5 +29,4 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${SRCS} ${HDRS})
 
 target_link_libraries(${PROJECT_NAME} 
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_FILESYSTEM_LIBRARY}
-)
+  )
