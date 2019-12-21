@@ -3,7 +3,6 @@ project(spirit_parser)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0")
-set(Boost_USE_STATIC_LIBS ON)
 
 if (UNIX)
     set(BOOST_ROOT "/opt/local/include")
